@@ -16,4 +16,8 @@
       <ProjectReference Include="..\GtMotive.Estimate.Microservice.Domain\GtMotive.Estimate.Microservice.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="UseCases\Rent\" />
+    </ItemGroup>
+
 </Project>

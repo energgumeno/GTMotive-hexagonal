@@ -18,7 +18,7 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.RentVehi
     {
         public async Task Execute(RentVehicleCommand request)
         {
-            //string? string?  Email,DateTime?  DateTime? TimeRentEnd,Guid? VehicleId
+            
             ArgumentNullException.ThrowIfNull(request);
             ArgumentException.ThrowIfNullOrWhiteSpace(request.Fullname);
             if (!request.TimeRentStart.HasValue) throw new ArgumentNullException(nameof(request.TimeRentStart));
