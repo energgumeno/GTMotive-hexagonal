@@ -15,9 +15,9 @@ namespace GtMotive.Estimate.Microservice.Infrastructure.Telemetry
             _telemetryClient = telemetry;
         }
 
-        public void TrackEvent(string eventName, IDictionary<string, string> properties = null, IDictionary<string, double> metrics = null)
+        public void TrackEvent(string eventName, IDictionary<string, string> properties = null)
         {
-            _telemetryClient.TrackEvent(eventName, properties, metrics);
+            _telemetryClient.TrackEvent(eventName, properties);
         }
 
         public void TrackMetric(string name, double value, IDictionary<string, string> properties = null)

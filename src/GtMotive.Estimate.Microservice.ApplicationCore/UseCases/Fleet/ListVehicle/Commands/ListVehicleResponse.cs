@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GtMotive.Estimate.Microservice.Domain.Vehicles.ValueObjects;
+using GtMotive.Estimate.Microservice.Domain.ValueObjects;
 
 namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehicle.Commands
 {

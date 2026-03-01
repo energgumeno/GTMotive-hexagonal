@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace GtMotive.Estimate.Microservice.Domain.Entities
+﻿namespace GtMotive.Estimate.Microservice.Domain.Common
 {
     /// <summary>
     /// A base entity.

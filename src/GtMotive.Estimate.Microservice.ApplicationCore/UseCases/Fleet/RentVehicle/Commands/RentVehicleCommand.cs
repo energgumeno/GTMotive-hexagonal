@@ -3,5 +3,5 @@ using System;
 
 namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.RentVehicle.Commands
 {
-    public record RentVehicleCommand(Guid VehicleId, string? FullName, DateTime? Date) : IUseCaseInput;
+    public record RentVehicleCommand(string? Fullname,string?  Email,DateTime?  TimeRentStart, DateTime? TimeRentEnd,Guid? VehicleId) : IUseCaseInput;
 }

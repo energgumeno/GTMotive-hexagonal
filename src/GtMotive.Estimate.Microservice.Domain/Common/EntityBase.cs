@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using GtMotive.Estimate.Microservice.Domain.Interfaces;
+﻿using GtMotive.Estimate.Microservice.Domain.Interfaces;
 
-namespace GtMotive.Estimate.Microservice.Domain.Entities
+namespace GtMotive.Estimate.Microservice.Domain.Common
 {
     /// <summary>
     /// Entity base for events.

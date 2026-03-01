@@ -1,7 +1,7 @@
-﻿using System;
-using GtMotive.Estimate.Microservice.Domain.Entities;
+﻿using GtMotive.Estimate.Microservice.Domain.Common;
+using GtMotive.Estimate.Microservice.Domain.Enums;
 
-namespace GtMotive.Estimate.Microservice.Domain.Aggregates
+namespace GtMotive.Estimate.Microservice.Domain.ValueObjects
 {
     public class RentInformation : BaseAggregate
     {
@@ -35,6 +35,22 @@ namespace GtMotive.Estimate.Microservice.Domain.Aggregates
             TimeRentEnd = timeRentEnd ?? DateTime.Now;
             VehicleId = vehicleId ?? Guid.NewGuid();
             Status = RentStatus.New;
+        }
+        
+        
+        public static RentInformation Create(
+            string fullname,
+            string? email,
+            DateTime? timeRentStart,
+            DateTime? timeRentEnd,
+            Guid? vehicleId)
+        {
+            return new RentInformation(
+                fullname,
+                email,
+                timeRentStart,
+                timeRentEnd,
+                vehicleId);
         }
     }
 }

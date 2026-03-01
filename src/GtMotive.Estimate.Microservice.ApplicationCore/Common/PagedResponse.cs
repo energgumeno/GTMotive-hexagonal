@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases
+﻿namespace GtMotive.Estimate.Microservice.ApplicationCore.Common
 {
     public record PagedResult<T>(
         IEnumerable<T> Data,

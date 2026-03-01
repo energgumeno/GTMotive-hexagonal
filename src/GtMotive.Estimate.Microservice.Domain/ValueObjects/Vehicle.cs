@@ -1,7 +1,6 @@
-﻿using System;
-using GtMotive.Estimate.Microservice.Domain.Entities;
+﻿using GtMotive.Estimate.Microservice.Domain.Common;
 
-namespace GtMotive.Estimate.Microservice.Domain.Vehicles.ValueObjects
+namespace GtMotive.Estimate.Microservice.Domain.ValueObjects
 {
     /// <summary>
     /// A vehicle.

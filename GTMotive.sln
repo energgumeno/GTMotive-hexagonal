@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GtMotive.Estimate.Microserv
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GtMotive.Estimate.Microservice.Host", "src\GtMotive.Estimate.Microservice.Host\GtMotive.Estimate.Microservice.Host.csproj", "{358730EB-B1AA-49FB-8D25-04F0557F7CB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GtMotive.Estimate.Microservice.PU", "GtMotive.Estimate.Microservice.PU\GtMotive.Estimate.Microservice.PU.csproj", "{A760D00A-4326-4B3A-86C3-35A4F62AFDB6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GtMotive.Estimate.Microservice.PU", "src\GtMotive.Estimate.Microservice.PU\GtMotive.Estimate.Microservice.PU.csproj", "{A760D00A-4326-4B3A-86C3-35A4F62AFDB6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

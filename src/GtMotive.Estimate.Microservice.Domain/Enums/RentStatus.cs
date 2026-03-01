@@ -1,4 +1,4 @@
-namespace GtMotive.Estimate.Microservice.Domain.Aggregates;
+namespace GtMotive.Estimate.Microservice.Domain.Enums;
 
 public enum RentStatus
 {

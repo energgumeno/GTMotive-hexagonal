@@ -17,8 +17,7 @@ namespace GtMotive.Estimate.Microservice.Domain.Interfaces
         /// <param name="metrics">Numeric measurements associated with this event.</param>
         void TrackEvent(
             string eventName,
-            IDictionary<string, string> properties = null,
-            IDictionary<string, double> metrics = null);
+            IDictionary<string, string> properties = null);
 
         /// <summary>
         /// Performance measurements such as queue lengths not related to specific events.
