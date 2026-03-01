@@ -1,4 +1,5 @@
 ﻿using GtMotive.Estimate.Microservice.Domain.Common;
+using GtMotive.Estimate.Microservice.Domain.Events;
 
 namespace GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates
 {
@@ -20,6 +21,16 @@ namespace GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates
                 timeRentStart,
                 timeRentEnd,
                 vehicleId);
+            vehicleRentAggregate.AddDomainEvent(new RentVehicleCreatedEvent());
+            return vehicleRentAggregate;
+        }
+
+        public static VehicleRentAggregate ReturnVehicle(RentInformation rentInformation)
+        {
+            VehicleRentAggregate vehicleRentAggregate = new VehicleRentAggregate();
+
+            rentInformation.ReturnVehicle();
+            vehicleRentAggregate.AddDomainEvent(new RentVehicleReturnedEvent(rentInformation.Id));
             return vehicleRentAggregate;
         }
     }

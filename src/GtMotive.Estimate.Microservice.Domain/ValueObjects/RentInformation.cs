@@ -52,5 +52,11 @@ namespace GtMotive.Estimate.Microservice.Domain.ValueObjects
                 timeRentEnd,
                 vehicleId);
         }
+
+        public void ReturnVehicle()
+        {
+            if (Status != RentStatus.Accepted) throw new InvalidOperationException("Cannot return vehicle if rent is not accepted");
+            Status = RentStatus.Returned;
+        }
     }
 }

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.AddVehicle.Commands;
 using GtMotive.Estimate.Microservice.Domain.Events;
 using GtMotive.Estimate.Microservice.Domain.Interfaces;
-using GtMotive.Estimate.Microservice.Domain.Interfaces.Services;
+using GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
 using GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates;
 
 namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.AddVehicle.Case
@@ -12,7 +12,7 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.AddVehic
     /// A Handler for a vehicle creation.
     /// </summary>
     public class AddVehicleCase(
-        IVehicleService vehicleService,
+        IVehiclePort vehiclePort,
         IBusFactory busFactory,
         ITelemetry telemetry,
         IOutputPortStandard<AddVehicleResponse> outputPortStandard) : IUseCase<AddVehicleCommand>
@@ -51,13 +51,13 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.AddVehic
                 request.LicensePlate);
 
 
-            using (vehicleService)
+            using (vehiclePort)
             {
                 telemetry.TrackEvent(nameof(AddVehicleCase),
                     new Dictionary<string, string>() { { "AddVehicleCase", "Start..." } });
                 
-                vehicleId = await vehicleService.AddVehicle(vehicleAggregate.CurrentVehicle);
-                await vehicleService.Save();
+                vehicleId = await vehiclePort.AddVehicle(vehicleAggregate.CurrentVehicle);
+                await vehiclePort.Save();
                 
                 foreach (var vehicleAggregateDomainEvent in vehicleAggregate.DomainEvents)
                 {

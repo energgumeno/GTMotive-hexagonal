@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehicle.Commands;
-using GtMotive.Estimate.Microservice.Domain.Interfaces.Services;
+using GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
 
 
 namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehicle.Case
@@ -12,10 +12,10 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehi
     /// <remarks>
     /// Initializes a new instance of the <see cref="ListVehicleCase"/> class.
     /// </remarks>
-    /// <param name="vehicleService"> the writing service.</param>
+    /// <param name="vehiclePort"> the writing service.</param>
     /// <param name="outputPortStandard"> an output standard port.</param>
     public class ListVehicleCase(
-        IVehicleService vehicleService,
+        IVehiclePort vehiclePort,
         IOutputPortStandard<ListVehicleResponse> outputPortStandard) : IUseCase<ListVehicleRequest>
     {
         /// <summary>
@@ -31,8 +31,11 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehi
             }
 
             ArgumentNullException.ThrowIfNull(request);
-            var result = await vehicleService.GetVehicles(request.PageIndex, request.PageSize);
-            outputPortStandard.StandardHandle(new ListVehicleResponse(result));
+            using (vehiclePort)
+            {
+                var result = await vehiclePort.GetVehicles(request.PageIndex, request.PageSize);
+                outputPortStandard.StandardHandle(new ListVehicleResponse(result));
+            }
         }
     }
 }

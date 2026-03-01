@@ -5,4 +5,5 @@ public enum RentStatus
     New,
     Accepted,
     Cancelled,
+    Returned
 }

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ReturnVehicle.Commands
+﻿namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.ReturnVehicle.Commands
 {
-    public record ReturnVehicleCommand(Guid Id) : IUseCaseInput;
+    public record ReturnVehicleCommand(Guid? RentId) : IUseCaseInput;
 }

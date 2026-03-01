@@ -1,14 +1,38 @@
-﻿using System;
-using System.Threading.Tasks;
-using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ReturnVehicle.Commands;
+﻿using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.ReturnVehicle.Commands;
+using GtMotive.Estimate.Microservice.Domain.Interfaces;
+using GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
+using GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates;
 
-namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ReturnVehicle.Case
+namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.ReturnVehicle.Case
 {
-    public class ReturnVehicleCase : IUseCase<ReturnVehicleCommand>
+    public class ReturnVehicleCase(IBusFactory busFactory, ITelemetry telemetry, IRentVehiclePort rentVehiclePort,IOutputPortStandard<ReturnVehicleResponse> outputPortStandard)
+        : IUseCase<ReturnVehicleCommand>
     {
-        public Task Execute(ReturnVehicleCommand request)
+        public async Task Execute(ReturnVehicleCommand request)
         {
-            throw new NotImplementedException();
+            ArgumentNullException.ThrowIfNull(request);
+            if (!request.RentId.HasValue) throw new ArgumentNullException(nameof(request.RentId));
+
+            var bus = busFactory.GetClient(typeof(ReturnVehicleCase));
+
+            using (rentVehiclePort)
+            {
+                telemetry.TrackEvent(nameof(ReturnVehicleCommand),
+                    new Dictionary<string, string>() { { nameof(ReturnVehicleCommand), "Start..." } });
+                var vehicleRent = await rentVehiclePort.GetVehicleRent(request.RentId.Value);
+
+                VehicleRentAggregate vehicleRentAggregate = VehicleRentAggregate.ReturnVehicle(vehicleRent);
+                await rentVehiclePort.AddVehicleRent(vehicleRentAggregate.RentVehicleInformation);
+
+                foreach (var vehicleRentAggregateDomainEvent in vehicleRentAggregate.DomainEvents)
+                {
+                    await bus.Send(vehicleRentAggregateDomainEvent);
+                }
+
+                telemetry.TrackEvent(nameof(ReturnVehicleCommand),
+                    new Dictionary<string, string>() { { nameof(ReturnVehicleCommand), "End..." } });
+            }
+            outputPortStandard.StandardHandle(new ReturnVehicleResponse(request.RentId.Value));
         }
     }
 }
