@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehicle.Commands;
 using GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
+using GtMotive.Estimate.Microservice.Domain.ValueObjects;
 
 
 namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehicle.Case
@@ -16,24 +17,34 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehi
     /// <param name="outputPortStandard"> an output standard port.</param>
     public class ListVehicleCase(
         IVehiclePort vehiclePort,
-        IOutputPortStandard<ListVehicleResponse> outputPortStandard) : IUseCase<ListVehicleRequest>
+        IOutputPortStandard<ListVehicleResponse> outputPortStandard,
+        IOutputPortNotFound outputPortNotFound) : IUseCase<ListVehicleRequest>
     {
         /// <summary>
         ///  finds the vehicle list for the current page
         /// </summary>
         /// <param name="request">the page configuration.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task Execute(ListVehicleRequest request)
+        public async Task Execute(ListVehicleRequest? request)
         {
-            if (request == null || request.PageIndex < 0 || request.PageSize > 0)
+            if (request == null || request.PageIndex < 0 || request.PageSize < 1)
             {
                 request = new ListVehicleRequest(0, 50);
             }
 
             ArgumentNullException.ThrowIfNull(request);
+            List<Vehicle?> result;
             using (vehiclePort)
             {
-                var result = await vehiclePort.GetVehicles(request.PageIndex, request.PageSize);
+                result = await vehiclePort.GetVehicles(request.PageIndex, request.PageSize);
+            }
+
+            if (result.Count == 0)
+            {
+                outputPortNotFound.NotFoundHandle("vehicle not found");
+            }
+            else
+            {
                 outputPortStandard.StandardHandle(new ListVehicleResponse(result));
             }
         }

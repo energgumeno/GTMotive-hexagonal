@@ -11,24 +11,26 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.RentVehic
         IRentVehiclePort rentVehiclePort,
         IBusFactory busFactory,
         ITelemetry telemetry,
-        IOutputPortStandard<RentVehicleResponse> outputPortStandard) : IUseCase<RentVehicleCommand>
+        IOutputPortStandard<RentVehicleResponse> outputPortStandard,
+        IOutputPortNotFound outputPortNotFound) : IUseCase<RentVehicleCommand>
     {
         public async Task Execute(RentVehicleCommand request)
         {
-            
             ArgumentNullException.ThrowIfNull(request);
             ArgumentException.ThrowIfNullOrWhiteSpace(request.Fullname);
             if (!request.TimeRentStart.HasValue) throw new ArgumentNullException(nameof(request.TimeRentStart));
             if (!request.TimeRentEnd.HasValue) throw new ArgumentNullException(nameof(request.TimeRentEnd));
             if (!request.VehicleId.HasValue) throw new ArgumentNullException(nameof(request.VehicleId));
-            
+
             var bus = busFactory.GetClient(typeof(VehicleCreatedEvent));
             using (vehiclePort)
             {
-                var vehicle = vehiclePort.GetVehicle(request.VehicleId.Value);
-
+                var vehicle = await vehiclePort.GetVehicle(request.VehicleId.Value);
                 if (vehicle == null)
-                    throw new InvalidOperationException($"Vehicle with id {request.VehicleId.Value} not found");
+                {
+                    outputPortNotFound.NotFoundHandle($"Vehicle with id {request.VehicleId.Value} not found");
+                    return;
+                }
             }
 
             var vehicleRentAggregate = VehicleRentAggregate.Create(
@@ -37,12 +39,13 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.RentVehic
                 request.TimeRentStart,
                 request.TimeRentEnd,
                 request.VehicleId);
+
             using (rentVehiclePort)
             {
-                await rentVehiclePort.AddVehicleRent(vehicleRentAggregate.RentVehicleInformation);
                 telemetry.TrackEvent(nameof(RentVehicleCase),
                     new Dictionary<string, string>() { { nameof(RentVehicleCase), "Start..." } });
 
+                await rentVehiclePort.AddVehicleRent(vehicleRentAggregate.RentVehicleInformation);
                 foreach (var vehicleRentAggregateDomainEvent in vehicleRentAggregate.DomainEvents)
                 {
                     await bus.Send(vehicleRentAggregateDomainEvent);

@@ -4,6 +4,7 @@ using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.AddVehicle.C
 using GtMotive.Estimate.Microservice.Domain.Events;
 using GtMotive.Estimate.Microservice.Domain.Interfaces;
 using GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
+using GtMotive.Estimate.Microservice.Domain.ValueObjects;
 using GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates;
 
 namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.AddVehicle.Case
@@ -15,7 +16,8 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.AddVehic
         IVehiclePort vehiclePort,
         IBusFactory busFactory,
         ITelemetry telemetry,
-        IOutputPortStandard<AddVehicleResponse> outputPortStandard) : IUseCase<AddVehicleCommand>
+        IOutputPortStandard<AddVehicleResponse> outputPortStandard,
+        IOutputPortNotFound outputPortNotFound) : IUseCase<AddVehicleCommand>
     {
         /// <summary>
         /// adds a vehicle to the collection
@@ -55,10 +57,17 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.AddVehic
             {
                 telemetry.TrackEvent(nameof(AddVehicleCase),
                     new Dictionary<string, string>() { { "AddVehicleCase", "Start..." } });
-                
-                vehicleId = await vehiclePort.AddVehicle(vehicleAggregate.CurrentVehicle);
+
+                Vehicle? vehicle = await vehiclePort.GetVehicle(vehicleAggregate.CurrentVehicle);
+                if (vehicle != null)
+                {
+                    outputPortNotFound.NotFoundHandle("vehicle already exists");
+                    return;
+                }
+
+                vehicleId = await vehiclePort.AddVehicle(vehicleAggregate.CurrentVehicle)!;
                 await vehiclePort.Save();
-                
+
                 foreach (var vehicleAggregateDomainEvent in vehicleAggregate.DomainEvents)
                 {
                     await bus.Send(vehicleAggregateDomainEvent);

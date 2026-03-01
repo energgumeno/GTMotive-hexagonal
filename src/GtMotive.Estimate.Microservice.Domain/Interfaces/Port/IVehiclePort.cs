@@ -11,8 +11,9 @@ namespace GtMotive.Estimate.Microservice.Domain.Interfaces.Port
     /// </remarks>
     public interface IVehiclePort:IUnitOfWork
     {
-        Task<List<Vehicle>> GetVehicles(int pageIndex, int pageSize);
-        Task<Vehicle> GetVehicle(Guid vehicleId);
+        Task<List<Vehicle?>> GetVehicles(int pageIndex, int pageSize);
+        Task<Vehicle?> GetVehicle(Guid vehicleId);
+        Task<Vehicle?> GetVehicle(Vehicle vehicle);
         Task<Guid> AddVehicle(Vehicle  vehicle);
     }
 }

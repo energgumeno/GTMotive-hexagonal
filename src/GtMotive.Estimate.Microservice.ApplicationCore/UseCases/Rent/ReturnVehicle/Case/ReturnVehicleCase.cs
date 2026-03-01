@@ -5,7 +5,7 @@ using GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates;
 
 namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.ReturnVehicle.Case
 {
-    public class ReturnVehicleCase(IBusFactory busFactory, ITelemetry telemetry, IRentVehiclePort rentVehiclePort,IOutputPortStandard<ReturnVehicleResponse> outputPortStandard)
+    public class ReturnVehicleCase(IBusFactory busFactory, ITelemetry telemetry, IRentVehiclePort rentVehiclePort,IOutputPortStandard<ReturnVehicleResponse> outputPortStandard, IOutputPortNotFound outputPortNotFound)
         : IUseCase<ReturnVehicleCommand>
     {
         public async Task Execute(ReturnVehicleCommand request)
@@ -19,8 +19,15 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.ReturnVeh
             {
                 telemetry.TrackEvent(nameof(ReturnVehicleCommand),
                     new Dictionary<string, string>() { { nameof(ReturnVehicleCommand), "Start..." } });
+                
                 var vehicleRent = await rentVehiclePort.GetVehicleRent(request.RentId.Value);
-
+                if (vehicleRent == null)
+                {
+                    outputPortNotFound.NotFoundHandle($"Vehicle rent with id {request.RentId.Value} not found");
+                    return;
+                }
+                
+                
                 VehicleRentAggregate vehicleRentAggregate = VehicleRentAggregate.ReturnVehicle(vehicleRent);
                 await rentVehiclePort.AddVehicleRent(vehicleRentAggregate.RentVehicleInformation);
 
