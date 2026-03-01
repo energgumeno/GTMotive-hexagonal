@@ -6,6 +6,15 @@ using GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates;
 
 namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.RentVehicle.Case;
 
+/// <summary>
+/// Use case for renting a vehicle.
+/// </summary>
+/// <param name="vehiclePort">Port for vehicle operations.</param>
+/// <param name="rentVehiclePort">Port for rent vehicle operations.</param>
+/// <param name="busFactory">Factory for bus clients.</param>
+/// <param name="telemetry">Telemetry service.</param>
+/// <param name="outputPortStandard">Standard output port.</param>
+/// <param name="outputPortNotFound">Not found output port.</param>
 public class RentVehicleCase(
     IVehiclePort vehiclePort,
     IRentVehiclePort rentVehiclePort,
@@ -14,6 +23,11 @@ public class RentVehicleCase(
     IOutputPortStandard<RentVehicleResponse> outputPortStandard,
     IOutputPortNotFound outputPortNotFound) : IUseCase<RentVehicleCommand>
 {
+    /// <summary>
+    /// Executes the rent vehicle use case.
+    /// </summary>
+    /// <param name="request">The rent vehicle command.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task Execute(RentVehicleCommand request)
     {
         ArgumentNullException.ThrowIfNull(request);
