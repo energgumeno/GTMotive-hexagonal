@@ -1,0 +1,6 @@
+@GtMotive.Estimate.Microservice.PU_HostAddress = http://localhost:5188
+
+GET {{GtMotive.Estimate.Microservice.PU_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
