@@ -5,8 +5,7 @@ namespace GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates
 {
     public class VehicleAggregate : EntityBase
     {
-
-        public Vehicle CurrentVehicle { get; private set; }
+        public Vehicle? CurrentVehicle { get; private set; }
 
         public static VehicleAggregate Create(
             DateTime? inputRegistrationDate,
@@ -15,7 +14,7 @@ namespace GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates
         {
             VehicleAggregate vehicleAggregate = new VehicleAggregate();
             vehicleAggregate.CurrentVehicle = Vehicle.Create(inputRegistrationDate, inputFrameId, inputLicensePlate);
-            vehicleAggregate.AddDomainEvent(new VehicleCreatedEvent());
+            vehicleAggregate.AddDomainEvent(new VehicleCreatedEvent(vehicleAggregate.CurrentVehicle));
             return vehicleAggregate;
         }
     }

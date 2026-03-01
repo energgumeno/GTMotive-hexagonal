@@ -1,18 +1,13 @@
 ﻿using System;
 using GtMotive.Estimate.Microservice.Domain.Interfaces;
+using GtMotive.Estimate.Microservice.Domain.ValueObjects;
 
 namespace GtMotive.Estimate.Microservice.Domain.Events
 {
-    public class RentVehicleCreatedEvent : IDomainEvent
+    public class RentVehicleCreatedEvent(RentInformation rentInformation) : IDomainEvent
     {
-        public RentVehicleCreatedEvent()
-        {
-            EventId = Guid.NewGuid();
-            OccurredOnUtc = DateTime.UtcNow;
-        }
-
-        public Guid EventId { get; set; }
-
-        public DateTime OccurredOnUtc { get; set; }
+        public Guid EventId { get; set; } = Guid.NewGuid();
+        public DateTime OccurredOnUtc { get; set; } = DateTime.UtcNow;
+        public RentInformation RentInformation { get; set; } = rentInformation;
     }
 }

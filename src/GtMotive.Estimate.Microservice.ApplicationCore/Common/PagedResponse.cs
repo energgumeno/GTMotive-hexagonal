@@ -1,7 +1,9 @@
-﻿namespace GtMotive.Estimate.Microservice.ApplicationCore.Common
+﻿using GtMotive.Estimate.Microservice.Domain.ValueObjects;
+
+namespace GtMotive.Estimate.Microservice.ApplicationCore.Common
 {
-    public record PagedResult<T>(
-        IEnumerable<T> Data,
+    public record PagedResponse<T>(
+        List<T?> Data,
         int TotalCount,
         int PageNumber,
         int PageSize

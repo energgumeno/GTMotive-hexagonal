@@ -58,14 +58,14 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.AddVehic
                 telemetry.TrackEvent(nameof(AddVehicleCase),
                     new Dictionary<string, string>() { { "AddVehicleCase", "Start..." } });
 
-                Vehicle? vehicle = await vehiclePort.GetVehicle(vehicleAggregate.CurrentVehicle);
+                Vehicle? vehicle = await vehiclePort.GetVehicle(vehicleAggregate.CurrentVehicle!);
                 if (vehicle != null)
                 {
                     outputPortNotFound.NotFoundHandle("vehicle already exists");
                     return;
                 }
 
-                vehicleId = await vehiclePort.AddVehicle(vehicleAggregate.CurrentVehicle)!;
+                vehicleId = await vehiclePort.AddVehicle(vehicleAggregate.CurrentVehicle!)!;
                 await vehiclePort.Save();
 
                 foreach (var vehicleAggregateDomainEvent in vehicleAggregate.DomainEvents)

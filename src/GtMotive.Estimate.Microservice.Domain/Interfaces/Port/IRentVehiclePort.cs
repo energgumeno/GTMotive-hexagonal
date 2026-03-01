@@ -4,7 +4,7 @@ namespace GtMotive.Estimate.Microservice.Domain.Interfaces.Port
 {
     public interface IRentVehiclePort:IUnitOfWork
     {
-        Task<List<RentInformation?>> GetVehiclesRent(int pageIndex, int pageSize);
+        Task<(List<RentInformation?>,int)> GetVehiclesRent(int pageIndex, int pageSize);
         Task<RentInformation?> GetVehicleRent(Guid vehicleId);
         Task<RentInformation?> GetVehicleRent(string Email);
         Task<Guid?> AddVehicleRent(RentInformation rentInformation);

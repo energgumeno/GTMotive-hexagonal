@@ -15,28 +15,30 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehi
     /// </remarks>
     /// <param name="vehiclePort"> the writing service.</param>
     /// <param name="outputPortStandard"> an output standard port.</param>
+    /// /// <param name="outputPortNotFound"> an output standard port.</param>
     public class ListVehicleCase(
         IVehiclePort vehiclePort,
         IOutputPortStandard<ListVehicleResponse> outputPortStandard,
-        IOutputPortNotFound outputPortNotFound) : IUseCase<ListVehicleRequest>
+        IOutputPortNotFound outputPortNotFound) : IUseCase<ListVehicleCommand>
     {
         /// <summary>
         ///  finds the vehicle list for the current page
         /// </summary>
         /// <param name="request">the page configuration.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task Execute(ListVehicleRequest? request)
+        public async Task Execute(ListVehicleCommand? request)
         {
             if (request == null || request.PageIndex < 0 || request.PageSize < 1)
             {
-                request = new ListVehicleRequest(0, 50);
+                request = new ListVehicleCommand(0, 50);
             }
 
             ArgumentNullException.ThrowIfNull(request);
             List<Vehicle?> result;
+            int TotalPages;
             using (vehiclePort)
             {
-                result = await vehiclePort.GetVehicles(request.PageIndex, request.PageSize);
+                (result,TotalPages) = await vehiclePort.GetVehicles(request.PageIndex, request.PageSize);
             }
 
             if (result.Count == 0)
@@ -45,7 +47,7 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehi
             }
             else
             {
-                outputPortStandard.StandardHandle(new ListVehicleResponse(result));
+                outputPortStandard.StandardHandle(new ListVehicleResponse(result,TotalPages ,request.PageIndex, request.PageSize));
             }
         }
     }

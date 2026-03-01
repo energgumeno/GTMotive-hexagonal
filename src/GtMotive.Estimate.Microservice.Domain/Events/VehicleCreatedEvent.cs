@@ -1,27 +1,15 @@
 ﻿using System;
 using GtMotive.Estimate.Microservice.Domain.Interfaces;
+using GtMotive.Estimate.Microservice.Domain.ValueObjects;
 
 namespace GtMotive.Estimate.Microservice.Domain.Events
 {
-    public class VehicleCreatedEvent : IDomainEvent
+    public class VehicleCreatedEvent( Vehicle vehicle) : IDomainEvent
     {
-        public Guid EventId { get; }
+        public Guid EventId { get; } = Guid.NewGuid();
 
-        public DateTime OccurredOnUtc { get; }
+        public DateTime OccurredOnUtc { get; } = DateTime.UtcNow;
 
-        /// <summary>
-        /// Gets Registration date.
-        /// </summary>
-        public DateTime RegistrationDate { get; }
-
-        /// <summary>
-        /// Gets Frame id.
-        /// </summary>
-        public string FrameId { get; }
-
-        /// <summary>
-        /// Gets License Plate.
-        /// </summary>
-        public string LicensePlate { get; }
+        private Vehicle vehicle { get; } = vehicle;
     }
 }

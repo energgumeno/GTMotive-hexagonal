@@ -5,7 +5,7 @@ namespace GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates
 {
     public class VehicleRentAggregate : EntityBase
     {
-        public RentInformation RentVehicleInformation { get; private set; }
+        public RentInformation? RentVehicleInformation { get; private set; }
 
         public static VehicleRentAggregate Create(
             string fullname,
@@ -21,7 +21,8 @@ namespace GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates
                 timeRentStart,
                 timeRentEnd,
                 vehicleId);
-            vehicleRentAggregate.AddDomainEvent(new RentVehicleCreatedEvent());
+            vehicleRentAggregate.AddDomainEvent(
+                new RentVehicleCreatedEvent(vehicleRentAggregate.RentVehicleInformation));
             return vehicleRentAggregate;
         }
 
@@ -30,7 +31,7 @@ namespace GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates
             VehicleRentAggregate vehicleRentAggregate = new VehicleRentAggregate();
 
             rentInformation.ReturnVehicle();
-            vehicleRentAggregate.AddDomainEvent(new RentVehicleReturnedEvent(rentInformation.Id));
+            vehicleRentAggregate.AddDomainEvent(new RentVehicleReturnedEvent(rentInformation));
             return vehicleRentAggregate;
         }
     }

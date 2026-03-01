@@ -18,9 +18,11 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.RentVehic
         {
             ArgumentNullException.ThrowIfNull(request);
             ArgumentException.ThrowIfNullOrWhiteSpace(request.Fullname);
+            ArgumentException.ThrowIfNullOrWhiteSpace(request.Email);
             if (!request.TimeRentStart.HasValue) throw new ArgumentNullException(nameof(request.TimeRentStart));
             if (!request.TimeRentEnd.HasValue) throw new ArgumentNullException(nameof(request.TimeRentEnd));
             if (!request.VehicleId.HasValue) throw new ArgumentNullException(nameof(request.VehicleId));
+
 
             var bus = busFactory.GetClient(typeof(VehicleCreatedEvent));
             using (vehiclePort)
@@ -45,7 +47,14 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.RentVehic
                 telemetry.TrackEvent(nameof(RentVehicleCase),
                     new Dictionary<string, string>() { { nameof(RentVehicleCase), "Start..." } });
 
-                await rentVehiclePort.AddVehicleRent(vehicleRentAggregate.RentVehicleInformation);
+                var rentVehicle = await rentVehiclePort.GetVehicleRent(request.Email);
+                if (rentVehicle != null)
+                {
+                    outputPortNotFound.NotFoundHandle($"{request.Email} has already a Lease.");
+                    return;
+                }
+
+                await rentVehiclePort.AddVehicleRent(vehicleRentAggregate.RentVehicleInformation!);
                 foreach (var vehicleRentAggregateDomainEvent in vehicleRentAggregate.DomainEvents)
                 {
                     await bus.Send(vehicleRentAggregateDomainEvent);
@@ -55,7 +64,7 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.RentVehic
                     new Dictionary<string, string>() { { nameof(RentVehicleCase), "End..." } });
             }
 
-            outputPortStandard.StandardHandle(new RentVehicleResponse(vehicleRentAggregate.RentVehicleInformation.Id));
+            outputPortStandard.StandardHandle(new RentVehicleResponse(vehicleRentAggregate.RentVehicleInformation!.Id));
         }
     }
 }

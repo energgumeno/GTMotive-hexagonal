@@ -29,7 +29,7 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.ReturnVeh
                 
                 
                 VehicleRentAggregate vehicleRentAggregate = VehicleRentAggregate.ReturnVehicle(vehicleRent);
-                await rentVehiclePort.AddVehicleRent(vehicleRentAggregate.RentVehicleInformation);
+                await rentVehiclePort.UpdateVehicleRent(vehicleRentAggregate.RentVehicleInformation!);
 
                 foreach (var vehicleRentAggregateDomainEvent in vehicleRentAggregate.DomainEvents)
                 {
