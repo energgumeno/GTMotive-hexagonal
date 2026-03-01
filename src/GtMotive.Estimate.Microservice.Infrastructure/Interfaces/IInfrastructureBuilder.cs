@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace GtMotive.Estimate.Microservice.Infrastructure.Interfaces
+namespace GtMotive.Estimate.Microservice.Infrastructure.Interfaces;
+
+public interface IInfrastructureBuilder
 {
-    public interface IInfrastructureBuilder
-    {
-        IServiceCollection Services { get; }
-    }
+    IServiceCollection Services { get; }
 }

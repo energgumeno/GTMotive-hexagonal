@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace GtMotive.Estimate.Microservice.Api.UseCases
+namespace GtMotive.Estimate.Microservice.Api.UseCases;
+
+internal interface IWebApiSetter
 {
-    internal interface IWebApiSetter
-    {
-        IActionResult ActionResult { set; }
-    }
+    IActionResult ActionResult { set; }
 }

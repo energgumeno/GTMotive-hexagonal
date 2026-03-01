@@ -1,13 +1,12 @@
-﻿namespace GtMotive.Estimate.Microservice.Domain.Common
+﻿namespace GtMotive.Estimate.Microservice.Domain.Common;
+
+/// <summary>
+///     A base entity.
+/// </summary>
+public abstract class BaseAggregate
 {
     /// <summary>
-    /// A base entity.
+    ///     Gets or sets Unique Id.
     /// </summary>
-    public abstract class BaseAggregate
-    {
-        /// <summary>
-        /// Gets or sets Unique Id.
-        /// </summary>
-        public Guid Id { get; set; }
-    }
+    public Guid Id { get; set; }
 }

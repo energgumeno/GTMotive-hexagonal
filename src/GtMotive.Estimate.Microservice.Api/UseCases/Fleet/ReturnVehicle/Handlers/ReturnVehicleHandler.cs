@@ -4,18 +4,15 @@ using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.ReturnVehicle
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GtMotive.Estimate.Microservice.Api.UseCases.Fleet.ReturnVehicle.Handlers
-{
-    public class ReturnVehicleHandler(IUseCase<ReturnVehicleCommand> rentVehiclePort, IWebApiPresenter webApiPresenter) : IRequestHandler<ReturnVehicleRequest, IActionResult>
-    {
-        public async  Task<IActionResult> Handle(ReturnVehicleRequest request, CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(request);
-            await rentVehiclePort.Execute(new ReturnVehicleCommand(request.Id));
-            return webApiPresenter.ActionResult;
-            
-        }
+namespace GtMotive.Estimate.Microservice.Api.UseCases.Fleet.ReturnVehicle.Handlers;
 
-        
+public class ReturnVehicleHandler(IUseCase<ReturnVehicleCommand> rentVehiclePort, IWebApiPresenter webApiPresenter)
+    : IRequestHandler<ReturnVehicleRequest, IActionResult>
+{
+    public async Task<IActionResult> Handle(ReturnVehicleRequest request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        await rentVehiclePort.Execute(new ReturnVehicleCommand(request.Id));
+        return webApiPresenter.ActionResult;
     }
 }

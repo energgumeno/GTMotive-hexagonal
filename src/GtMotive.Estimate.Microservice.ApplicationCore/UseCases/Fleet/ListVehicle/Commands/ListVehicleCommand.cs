@@ -1,7 +1,5 @@
-﻿
-using GtMotive.Estimate.Microservice.ApplicationCore.Common;
+﻿using GtMotive.Estimate.Microservice.ApplicationCore.Common;
 
-namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehicle.Commands
-{
-    public record ListVehicleCommand(int PageIndex, int PageSize) : PagedRequest(PageIndex, PageSize), IUseCaseInput;
-}
+namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehicle.Commands;
+
+public record ListVehicleCommand(int PageIndex, int PageSize) : PagedRequest(PageIndex, PageSize), IUseCaseInput;

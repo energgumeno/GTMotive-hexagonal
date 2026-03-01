@@ -1,9 +1,8 @@
-﻿namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases
+﻿namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases;
+
+/// <summary>
+///     Input Message interface marker.
+/// </summary>
+public interface IUseCaseInput
 {
-    /// <summary>
-    /// Input Message interface marker.
-    /// </summary>
-    public interface IUseCaseInput
-    {
-    }
 }
