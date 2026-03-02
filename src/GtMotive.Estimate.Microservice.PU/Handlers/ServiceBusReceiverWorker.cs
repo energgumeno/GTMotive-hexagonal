@@ -19,11 +19,12 @@ public class ServiceBusReceiverWorker : BackgroundService
     public ServiceBusReceiverWorker(
         IOptions<ServiceBusSettings> settings,
         ILogger<ServiceBusReceiverWorker> logger,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        AzureBusFactory busFactory)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
-        _client = new ServiceBusClient(settings.Value.ConnectionString);
+        _client = busFactory.GetClientInstance();
         _processor = _client.CreateProcessor(settings.Value.QueueName, new ServiceBusProcessorOptions());
     }
 
@@ -96,7 +97,7 @@ public class ServiceBusReceiverWorker : BackgroundService
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
         await _processor.DisposeAsync();
-        await _client.DisposeAsync();
+        // El cliente de ServiceBus es gestionado por la factoría registrada como Singleton
         await base.StopAsync(cancellationToken);
     }
 }

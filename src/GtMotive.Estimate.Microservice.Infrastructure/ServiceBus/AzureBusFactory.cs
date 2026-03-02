@@ -27,6 +27,11 @@ public class AzureBusFactory : IBusFactory, IAsyncDisposable
         return new AzureBus(sender);
     }
 
+    public ServiceBusClient GetClientInstance()
+    {
+        return _client;
+    }
+
     public async ValueTask DisposeAsync()
     {
         await _client.DisposeAsync();

@@ -7,20 +7,20 @@ namespace GtMotive.Estimate.Microservice.Infrastructure.Telemetry;
 [ExcludeFromCodeCoverage]
 public class AppTelemetry : ITelemetry
 {
-    private readonly TelemetryClient _telemetryClient;
+    private readonly TelemetryClient? _telemetryClient;
 
-    public AppTelemetry(TelemetryClient telemetry)
+    public AppTelemetry(TelemetryClient? telemetry = null)
     {
         _telemetryClient = telemetry;
     }
 
     public void TrackEvent(string eventName, IDictionary<string, string>? properties = null)
     {
-        _telemetryClient.TrackEvent(eventName, properties);
+        _telemetryClient?.TrackEvent(eventName, properties);
     }
 
     public void TrackMetric(string name, double value, IDictionary<string, string>? properties = null)
     {
-        _telemetryClient.TrackMetric(name, value, properties);
+        _telemetryClient?.TrackMetric(name, value, properties);
     }
 }

@@ -1,7 +1,9 @@
-using GtMotive.Estimate.Microservice.Api.DependencyInjection;
-using GtMotive.Estimate.Microservice.Infrastructure.ServiceBus;
+using GtMotive.Estimate.Microservice.Api.UseCases.Fleet.AddVehicle.Handlers;
+using GtMotive.Estimate.Microservice.ApplicationCore.DependencyInjection;
+using GtMotive.Estimate.Microservice.Infrastructure.DependencyInjection;
 using GtMotive.Estimate.Microservice.PU;
 using GtMotive.Estimate.Microservice.PU.Handlers;
+using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,8 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddPresenters();
-builder.Services.Configure<ServiceBusSettings>(builder.Configuration.GetSection("ServiceBus"));
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplicationCore();
+builder.Services.AddMediatR(typeof(AddVehicleHandler).Assembly);
 builder.Services.AddHostedService<ServiceBusReceiverWorker>();
 
 var app = builder.Build();

@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 builder.Services.AddControllers();
-builder.Services.AddPresenters();
+builder.Services.AddPresenters(builder.Configuration);
 builder.Services.AddMediatR(typeof(AddVehicleHandler).Assembly);
 
 var app = builder.Build();
@@ -21,3 +21,5 @@ if (app.Environment.IsDevelopment()) app.MapOpenApi();
 app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();
+
+public partial class Program { }

@@ -1,5 +1,7 @@
 using GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
 using GtMotive.Estimate.Microservice.Domain.ValueObjects;
+using GtMotive.Estimate.Microservice.Infrastructure.MongoDb.Settings;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
 namespace GtMotive.Estimate.Microservice.Infrastructure.MongoDb;
@@ -8,9 +10,9 @@ public class MongoVehicleAdapter : IVehiclePort
 {
     private readonly IMongoCollection<Vehicle> _collection;
 
-    public MongoVehicleAdapter(MongoService mongoService)
+    public MongoVehicleAdapter(MongoService mongoService, IOptions<MongoDbSettings> options)
     {
-        var database = mongoService.MongoClient.GetDatabase("GtMotiveEstimate");
+        var database = mongoService.MongoClient.GetDatabase(options.Value.MongoDbDatabaseName);
         _collection = database.GetCollection<Vehicle>("Vehicles");
     }
 
