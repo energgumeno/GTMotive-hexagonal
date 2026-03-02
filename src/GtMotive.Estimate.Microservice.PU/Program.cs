@@ -1,10 +1,17 @@
+using GtMotive.Estimate.Microservice.Api.DependencyInjection;
+using GtMotive.Estimate.Microservice.Infrastructure.ServiceBus;
 using GtMotive.Estimate.Microservice.PU;
+using GtMotive.Estimate.Microservice.PU.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddPresenters();
+builder.Services.Configure<ServiceBusSettings>(builder.Configuration.GetSection("ServiceBus"));
+builder.Services.AddHostedService<ServiceBusReceiverWorker>();
 
 var app = builder.Build();
 

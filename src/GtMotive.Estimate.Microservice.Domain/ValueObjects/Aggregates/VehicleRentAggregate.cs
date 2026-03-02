@@ -26,11 +26,26 @@ public class VehicleRentAggregate : EntityBase
         return vehicleRentAggregate;
     }
 
+    public static VehicleRentAggregate AcceptRent(RentInformation rentInformation)
+    {
+        var aggregate = new VehicleRentAggregate { RentVehicleInformation = rentInformation };
+        aggregate.RentVehicleInformation.Accept();
+        // aggregate.AddDomainEvent(new RentVehicleAcceptedEvent(rentInformation)); // Opcional si se requiere un evento de salida
+        return aggregate;
+    }
+
+    public static VehicleRentAggregate CancelRent(RentInformation rentInformation)
+    {
+        var aggregate = new VehicleRentAggregate { RentVehicleInformation = rentInformation };
+        aggregate.RentVehicleInformation.Cancel();
+        return aggregate;
+    }
+
     public static VehicleRentAggregate ReturnVehicle(RentInformation rentInformation)
     {
-        var vehicleRentAggregate = new VehicleRentAggregate();
+        var vehicleRentAggregate = new VehicleRentAggregate { RentVehicleInformation = rentInformation };
 
-        rentInformation.ReturnVehicle();
+        vehicleRentAggregate.RentVehicleInformation.ReturnVehicle();
         vehicleRentAggregate.AddDomainEvent(new RentVehicleReturnedEvent(rentInformation));
         return vehicleRentAggregate;
     }

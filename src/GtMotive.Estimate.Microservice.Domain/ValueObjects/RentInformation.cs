@@ -27,15 +27,15 @@ public class RentInformation : BaseAggregate
     }
 
     //should be moved to user in a bounded context
-    public string Fullname { get; set; }
-    public string Email { get; set; }
+    public string Fullname { get; private set; }
+    public string Email { get; private set; }
 
     //should be moved to user in a bounded context
 
-    public Guid VehicleId { get; set; }
-    public RentStatus Status { get; set; }
-    public DateTime TimeRentStart { get; set; }
-    public DateTime TimeRentEnd { get; set; }
+    public Guid VehicleId { get; private set; }
+    public RentStatus Status { get; private set; }
+    public DateTime TimeRentStart { get; private set; }
+    public DateTime TimeRentEnd { get; private set; }
 
 
     public static RentInformation Create(
@@ -51,6 +51,20 @@ public class RentInformation : BaseAggregate
             timeRentStart,
             timeRentEnd,
             vehicleId);
+    }
+
+    public void Accept()
+    {
+        if (Status != RentStatus.New)
+            throw new InvalidOperationException("Cannot accept rent if status is not New");
+        Status = RentStatus.Accepted;
+    }
+
+    public void Cancel()
+    {
+        if (Status != RentStatus.New)
+            throw new InvalidOperationException("Cannot cancel rent if status is not New");
+        Status = RentStatus.Cancelled;
     }
 
     public void ReturnVehicle()
