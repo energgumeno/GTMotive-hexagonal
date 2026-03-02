@@ -55,7 +55,7 @@ namespace GtMotive.Estimate.Microservice.FunctionalTests
             var command = new RentVehicleCommand("John Doe", "john@example.com", DateTime.Now.AddDays(1), DateTime.Now.AddDays(2), vehicleId);
 
             _vehiclePortMock.Setup(v => v.GetVehicle(vehicleId)).ReturnsAsync(vehicle);
-            _rentVehiclePortMock.Setup(r => r.GetVehicleRent(command.Email)).ReturnsAsync((RentInformation)null);
+            _rentVehiclePortMock.Setup(r => r.GetVehicleRent(command.Email!)).ReturnsAsync((RentInformation?)null);
 
             // Act
             await _useCase.Execute(command);
@@ -78,7 +78,7 @@ namespace GtMotive.Estimate.Microservice.FunctionalTests
             var vehicleId = Guid.NewGuid();
             var command = new RentVehicleCommand("John Doe", "john@example.com", DateTime.Now.AddDays(1), DateTime.Now.AddDays(2), vehicleId);
 
-            _vehiclePortMock.Setup(v => v.GetVehicle(vehicleId)).ReturnsAsync((Vehicle)null);
+            _vehiclePortMock.Setup(v => v.GetVehicle(vehicleId)).ReturnsAsync((Vehicle?)null);
 
             // Act
             await _useCase.Execute(command);

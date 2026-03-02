@@ -2,7 +2,7 @@
 
 public class MongoDbSettings
 {
-    public string ConnectionString { get; set; }
+    public string ConnectionString { get; set; } = string.Empty;
 
-    public string MongoDbDatabaseName { get; set; }
+    public string MongoDbDatabaseName { get; set; } = string.Empty;
 }
