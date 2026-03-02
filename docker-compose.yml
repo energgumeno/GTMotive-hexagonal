@@ -5,24 +5,9 @@
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - sb-emulator
 
-  servicebus-emulator:
-    image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
-    ports:
-      - "5672:5672"
-      - "9030:9030"
-    environment:
-      - ACCEPT_EULA=Y
-      - SQL_SERVER_FQDN=sqlserver
-      - MSSQL_SA_PASSWORD=YourPassword123!
-    depends_on:
-      - sqlserver
-
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=YourPassword123!
 
   host:
     build:
@@ -34,11 +19,13 @@
       - ASPNETCORE_ENVIRONMENT=Development
       - MongoDb__ConnectionString=mongodb://mongodb:27017
       - MongoDb__MongoDbDatabaseName=GtMotiveEstimate
-      - ServiceBus__ConnectionString=Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;
+      - ServiceBus__ConnectionString=Endpoint=sb://emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;
       - ServiceBus__QueueName=estimates-queue
     depends_on:
       - mongodb
-      - servicebus-emulator
+      - emulator
+    networks:
+      - sb-emulator
 
   pu:
     build:
@@ -48,11 +35,52 @@
       - ASPNETCORE_ENVIRONMENT=Development
       - MongoDb__ConnectionString=mongodb://mongodb:27017
       - MongoDb__MongoDbDatabaseName=GtMotiveEstimate
-      - ServiceBus__ConnectionString=Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;
+      - ServiceBus__ConnectionString=Endpoint=sb://emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;
       - ServiceBus__QueueName=estimates-queue
     depends_on:
       - mongodb
-      - servicebus-emulator
+      - emulator
+    networks:
+      - sb-emulator
+
+  emulator:
+    container_name: "servicebus-emulator"
+    image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
+    volumes:
+      - ./ServiceBusConfig.json:/ServiceBus_Emulator/ConfigFiles/Config.json
+    ports:
+      - "5672:5672"
+      - "9030:9030"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourPassword123!
+      - SQL_SERVER=sqlserver
+      - SQL_SERVER_FQDN=sqlserver
+      - MSSQL_FQDN=sqlserver
+      - MSSQL_CONNECTION_STRING=Server=sqlserver;User Id=sa;Password=YourPassword123!;TrustServerCertificate=True
+    depends_on:
+      - sqlserver
+    networks:
+      sb-emulator:
+        aliases:
+          - "servicebus-emulator"
+          - "sb-emulator"
+
+  sqlserver:
+    container_name: "sqlserver"
+    image: "mcr.microsoft.com/azure-sql-edge:latest"
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourPassword123!
+    networks:
+      sb-emulator:
+        aliases:
+          - "sqlserver"
+          - "sqledge"
+networks:
+  sb-emulator:
 
 volumes:
   mongodb_data:
