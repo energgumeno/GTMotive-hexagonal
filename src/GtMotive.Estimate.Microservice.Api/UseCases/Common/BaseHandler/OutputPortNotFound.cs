@@ -1,7 +1,7 @@
 ﻿using GtMotive.Estimate.Microservice.ApplicationCore.UseCases;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GtMotive.Estimate.Microservice.Api.UseCases.Common.NotFound;
+namespace GtMotive.Estimate.Microservice.Api.UseCases.Common.BaseHandler;
 
 internal class OutputPortNotFound(IWebApiPresenter webApiSetter) : IOutputPortNotFound
 {

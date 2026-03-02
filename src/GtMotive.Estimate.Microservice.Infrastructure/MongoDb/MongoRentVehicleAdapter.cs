@@ -27,16 +27,19 @@ public class MongoRentVehicleAdapter : IRentVehiclePort
 
         return (rents.Cast<RentInformation?>().ToList(), totalCount);
     }
-    
+
 
     public async Task<RentInformation?> GetVehicleRentByRentId(Guid rentId)
     {
         var result = await _collection.Find(r => r.Id == rentId).FirstOrDefaultAsync();
         return result?.Id == rentId ? result : null;
     }
+
     public async Task<List<RentInformation>> GetVehiclesRentByVehicleId(Guid vehicleId)
     {
-        return  await _collection.Find(r => r.VehicleId == vehicleId && (r.Status!=RentStatus.Returned ||r.Status==RentStatus.Cancelled)).ToListAsync();
+        return await _collection.Find(r =>
+                r.VehicleId == vehicleId && (r.Status != RentStatus.Returned || r.Status == RentStatus.Cancelled))
+            .ToListAsync();
     }
 
     public async Task<RentInformation?> GetVehicleRent(string email)

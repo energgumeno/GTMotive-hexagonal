@@ -29,13 +29,14 @@ public class MongoVehicleAdapter : IVehiclePort
 
     public async Task<Vehicle?> GetVehicle(Guid vehicleId)
     {
-        var ret= await _collection.Find(v => v.Id == vehicleId).FirstOrDefaultAsync();
+        var ret = await _collection.Find(v => v.Id == vehicleId).FirstOrDefaultAsync();
         return ret?.Id == vehicleId ? ret : null;
     }
 
     public async Task<Vehicle?> GetVehicle(Vehicle vehicle)
     {
-        var ret= await _collection.Find(v => v.LicensePlate == vehicle.LicensePlate || v.FrameId == vehicle.FrameId).FirstOrDefaultAsync();
+        var ret = await _collection.Find(v => v.LicensePlate == vehicle.LicensePlate || v.FrameId == vehicle.FrameId)
+            .FirstOrDefaultAsync();
         return ret?.LicensePlate == vehicle.LicensePlate || ret?.FrameId == vehicle.FrameId ? ret : null;
     }
 
@@ -52,7 +53,6 @@ public class MongoVehicleAdapter : IVehiclePort
 
     public void Dispose()
     {
-        
         GC.SuppressFinalize(this);
     }
 }

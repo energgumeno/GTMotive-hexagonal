@@ -3,7 +3,7 @@
 namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehicle.Commands;
 
 /// <summary>
-/// Represents a command to list vehicles with pagination.
+///     Represents a command to list vehicles with pagination.
 /// </summary>
 /// <param name="PageIndex">The index of the page.</param>
 /// <param name="PageSize">The size of the page.</param>

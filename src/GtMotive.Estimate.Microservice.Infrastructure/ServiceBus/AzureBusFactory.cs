@@ -19,6 +19,12 @@ public class AzureBusFactory : IBusFactory, IAsyncDisposable
         _queueName = settings.Value.QueueName;
     }
 
+    public async ValueTask DisposeAsync()
+    {
+        await _client.DisposeAsync();
+        GC.SuppressFinalize(this);
+    }
+
     public IBus GetClient(Type eventType)
     {
         // En esta implementación simplificada, usamos la misma cola para todos los eventos.
@@ -30,11 +36,5 @@ public class AzureBusFactory : IBusFactory, IAsyncDisposable
     public ServiceBusClient GetClientInstance()
     {
         return _client;
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await _client.DisposeAsync();
-        GC.SuppressFinalize(this);
     }
 }

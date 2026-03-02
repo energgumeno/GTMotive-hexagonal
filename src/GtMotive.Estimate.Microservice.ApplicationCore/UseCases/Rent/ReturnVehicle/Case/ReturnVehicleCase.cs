@@ -6,7 +6,7 @@ using GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates;
 namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.ReturnVehicle.Case;
 
 /// <summary>
-/// Use case for returning a vehicle.
+///     Use case for returning a vehicle.
 /// </summary>
 /// <param name="busFactory">Factory for bus clients.</param>
 /// <param name="telemetry">Telemetry service.</param>
@@ -22,7 +22,7 @@ public class ReturnVehicleCase(
     : IUseCase<ReturnVehicleCommand>
 {
     /// <summary>
-    /// Executes the return vehicle use case.
+    ///     Executes the return vehicle use case.
     /// </summary>
     /// <param name="request">The return vehicle command.</param>
     /// <returns>A task representing the asynchronous operation.</returns>

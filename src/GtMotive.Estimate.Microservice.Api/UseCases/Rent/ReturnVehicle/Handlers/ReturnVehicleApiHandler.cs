@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GtMotive.Estimate.Microservice.Api.UseCases.Rent.ReturnVehicle.Handlers;
 
-public class ReturnVehicleApiHandler(IUseCase<ReturnVehicleCommand> returnVehicleUseCase, IWebApiPresenter webApiPresenter)
+public class ReturnVehicleApiHandler(
+    IUseCase<ReturnVehicleCommand> returnVehicleUseCase,
+    IWebApiPresenter webApiPresenter)
     : IRequestHandler<ReturnVehicleApiRequest, IActionResult>
 {
     public async Task<IActionResult> Handle(ReturnVehicleApiRequest request, CancellationToken cancellationToken)

@@ -9,7 +9,7 @@ using GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates;
 namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.RentVehicle.Case;
 
 /// <summary>
-/// Use case for renting a vehicle.
+///     Use case for renting a vehicle.
 /// </summary>
 /// <param name="vehiclePort">Port for vehicle operations.</param>
 /// <param name="rentVehiclePort">Port for rent vehicle operations.</param>
@@ -26,7 +26,7 @@ public class RentVehicleCase(
     IOutputPortNotFound outputPortNotFound) : IUseCase<RentVehicleCommand>
 {
     /// <summary>
-    /// Executes the rent vehicle use case.
+    ///     Executes the rent vehicle use case.
     /// </summary>
     /// <param name="request">The rent vehicle command.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
@@ -71,11 +71,11 @@ public class RentVehicleCase(
                 return;
             }
 
-            List<RentInformation> reservations = await rentVehiclePort.GetVehiclesRentByVehicleId(request.VehicleId.Value) ?? new List<RentInformation>();
-            foreach (var current  in reservations)
-            {
-                if (!CheckVehicleAvailability(request, current)) return;                
-            }
+            var reservations = await rentVehiclePort.GetVehiclesRentByVehicleId(request.VehicleId.Value) ??
+                               new List<RentInformation>();
+            foreach (var current in reservations)
+                if (!CheckVehicleAvailability(request, current))
+                    return;
 
 
             await rentVehiclePort.AddVehicleRent(vehicleRentAggregate.RentVehicleInformation!);

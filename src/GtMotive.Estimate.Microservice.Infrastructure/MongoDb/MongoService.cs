@@ -27,16 +27,13 @@ public class MongoService
         BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
 
         if (!BsonClassMap.IsClassMapRegistered(typeof(BaseAggregate)))
-        {
             BsonClassMap.RegisterClassMap<BaseAggregate>(cm =>
             {
                 cm.AutoMap();
                 cm.MapIdProperty(c => c.Id);
             });
-        }
 
         if (!BsonClassMap.IsClassMapRegistered(typeof(Vehicle)))
-        {
             BsonClassMap.RegisterClassMap<Vehicle>(cm =>
             {
                 cm.AutoMap();
@@ -48,10 +45,8 @@ public class MongoService
                 // Esto es necesario para clases sin constructor sin parámetros y con propiedades de solo lectura.
                 cm.MapCreator(v => new Vehicle(v.RegistrationDate, v.FrameId, v.LicensePlate));
             });
-        }
 
         if (!BsonClassMap.IsClassMapRegistered(typeof(RentInformation)))
-        {
             BsonClassMap.RegisterClassMap<RentInformation>(cm =>
             {
                 cm.AutoMap();
@@ -62,8 +57,8 @@ public class MongoService
                 cm.MapProperty(r => r.TimeRentStart);
                 cm.MapProperty(r => r.TimeRentEnd);
 
-                cm.MapCreator(r => new RentInformation(r.Fullname, r.Email, r.TimeRentStart, r.TimeRentEnd, r.VehicleId, r.Status));
+                cm.MapCreator(r =>
+                    new RentInformation(r.Fullname, r.Email, r.TimeRentStart, r.TimeRentEnd, r.VehicleId, r.Status));
             });
-        }
     }
 }

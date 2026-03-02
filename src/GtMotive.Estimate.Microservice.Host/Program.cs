@@ -1,6 +1,5 @@
 using GtMotive.Estimate.Microservice.Api.DependencyInjection;
 using GtMotive.Estimate.Microservice.Api.UseCases.Fleet.AddVehicle.Handlers;
-using GtMotive.Estimate.Microservice.Host;
 using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,4 +27,9 @@ app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();
 
-public partial class Program { }
+namespace GtMotive.Estimate.Microservice.Host
+{
+    public class Program
+    {
+    }
+}

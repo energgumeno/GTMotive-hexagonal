@@ -1,7 +1,7 @@
 ﻿namespace GtMotive.Estimate.Microservice.ApplicationCore.Common;
 
 /// <summary>
-/// Represents a paged response.
+///     Represents a paged response.
 /// </summary>
 /// <typeparam name="T">The type of the data.</typeparam>
 /// <param name="Data">The list of data.</param>
@@ -17,7 +17,7 @@ public record PagedResponse<T>(
     where T : class
 {
     /// <summary>
-    /// Gets the total number of pages.
+    ///     Gets the total number of pages.
     /// </summary>
     public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
 }

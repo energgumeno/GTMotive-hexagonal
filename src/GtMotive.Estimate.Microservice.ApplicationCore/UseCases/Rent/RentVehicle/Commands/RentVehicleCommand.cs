@@ -1,7 +1,7 @@
 ﻿namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.RentVehicle.Commands;
 
 /// <summary>
-/// Represents a command to rent a vehicle.
+///     Represents a command to rent a vehicle.
 /// </summary>
 /// <param name="Fullname">The full name of the person renting the vehicle.</param>
 /// <param name="Email">The email address of the person renting the vehicle.</param>

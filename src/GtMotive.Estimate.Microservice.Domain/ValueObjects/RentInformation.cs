@@ -28,8 +28,8 @@ public class RentInformation : BaseAggregate
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RentInformation"/> class.
-    /// This constructor is for deserialization only.
+    ///     Initializes a new instance of the <see cref="RentInformation" /> class.
+    ///     This constructor is for deserialization only.
     /// </summary>
     private RentInformation()
     {

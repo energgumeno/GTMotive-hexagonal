@@ -1,8 +1,8 @@
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 using GtMotive.Estimate.Microservice.ApplicationCore.UseCases;
-using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.ProcessRentCreated;
-using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.ProcessRentReturned;
+using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.ProcessRentCreated.Commands;
+using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.ProcessRentReturned.Commands;
 using GtMotive.Estimate.Microservice.Domain.Events;
 using GtMotive.Estimate.Microservice.Infrastructure.ServiceBus;
 using Microsoft.Extensions.Options;
@@ -11,9 +11,14 @@ namespace GtMotive.Estimate.Microservice.PU.Handlers;
 
 public class ServiceBusReceiverWorker : BackgroundService
 {
+    private static readonly JsonSerializerOptions SerializationOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     private readonly ServiceBusClient _client;
-    private readonly ServiceBusProcessor _processor;
     private readonly ILogger<ServiceBusReceiverWorker> _logger;
+    private readonly ServiceBusProcessor _processor;
     private readonly IServiceProvider _serviceProvider;
 
     public ServiceBusReceiverWorker(
@@ -35,18 +40,10 @@ public class ServiceBusReceiverWorker : BackgroundService
 
         await _processor.StartProcessingAsync(stoppingToken);
 
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            await Task.Delay(1000, stoppingToken);
-        }
+        while (!stoppingToken.IsCancellationRequested) await Task.Delay(1000, stoppingToken);
 
         await _processor.StopProcessingAsync(stoppingToken);
     }
-
-    private static readonly JsonSerializerOptions SerializationOptions = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
 
     private async Task MessageHandler(ProcessMessageEventArgs args)
     {
@@ -68,7 +65,8 @@ public class ServiceBusReceiverWorker : BackgroundService
             switch (messageType)
             {
                 case nameof(RentVehicleReturnedEvent):
-                    var returnedEvent = JsonSerializer.Deserialize<RentVehicleReturnedEvent>(body, SerializationOptions);
+                    var returnedEvent =
+                        JsonSerializer.Deserialize<RentVehicleReturnedEvent>(body, SerializationOptions);
                     if (returnedEvent != null)
                     {
                         var useCase = scope.ServiceProvider.GetRequiredService<IUseCase<ProcessRentReturnedCommand>>();
@@ -106,7 +104,8 @@ public class ServiceBusReceiverWorker : BackgroundService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error processing message with type {MessageType} and body: {Body}", messageType, body);
+            _logger.LogError(ex, "Error processing message with type {MessageType} and body: {Body}", messageType,
+                body);
         }
 
         await args.CompleteMessageAsync(args.Message);

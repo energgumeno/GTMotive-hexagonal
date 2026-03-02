@@ -4,7 +4,7 @@ using GtMotive.Estimate.Microservice.Domain.ValueObjects;
 namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehicle.Commands;
 
 /// <summary>
-/// Represents a response with a list of vehicles and pagination information.
+///     Represents a response with a list of vehicles and pagination information.
 /// </summary>
 /// <param name="Data">The list of vehicles.</param>
 /// <param name="TotalCount">The total count of items.</param>
