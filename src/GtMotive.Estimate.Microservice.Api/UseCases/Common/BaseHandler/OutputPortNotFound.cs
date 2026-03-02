@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GtMotive.Estimate.Microservice.Api.UseCases.Common.NotFound;
 
-internal class OutputPortNotFound(IWebApiSetter webApiSetter) : IOutputPortNotFound
+internal class OutputPortNotFound(IWebApiPresenter webApiSetter) : IOutputPortNotFound
 {
     public void NotFoundHandle(string message)
     {

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GtMotive.Estimate.Microservice.Api.UseCases.Common.NotFound;
 
-internal class BaseHandler<T>(IWebApiSetter webApiSetter) : IOutputPortStandard<T> where T : IUseCaseOutput
+internal class BaseHandler<T>(IWebApiPresenter webApiSetter) : IOutputPortStandard<T> where T : IUseCaseOutput
 {
     public void StandardHandle(T response)
     {

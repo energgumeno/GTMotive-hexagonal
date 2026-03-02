@@ -22,7 +22,7 @@ public class RentInformation : BaseAggregate
         Email = email;
         TimeRentStart = timeRentStart ?? DateTime.Now;
         TimeRentEnd = timeRentEnd ?? DateTime.Now;
-        VehicleId = vehicleId ?? Guid.NewGuid();
+        VehicleId = vehicleId ?? Guid.Empty;
         Status = RentStatus.New;
     }
 
@@ -50,7 +50,10 @@ public class RentInformation : BaseAggregate
             email,
             timeRentStart,
             timeRentEnd,
-            vehicleId);
+            vehicleId)
+        {
+            Id = Guid.NewGuid()
+        };
     }
 
     public void Accept()

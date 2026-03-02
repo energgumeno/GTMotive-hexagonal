@@ -18,7 +18,6 @@ namespace GtMotive.Estimate.Microservice.Api.DependencyInjection
 
             // web api
             services.AddScoped<IWebApiPresenter, WebApiPresenter>();
-            services.AddScoped<IWebApiSetter, WebApiPresenter>();
 
             // output ports
             services.AddScoped<IOutputPortNotFound, OutputPortNotFound>();

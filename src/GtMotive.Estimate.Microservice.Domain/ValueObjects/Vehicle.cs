@@ -13,7 +13,7 @@ public class Vehicle : BaseAggregate
     /// <param name="registrationDate"> registration date.</param>
     /// <param name="frameId">Frame Id.</param>
     /// <param name="licensePlate">License plate.</param>
-    private Vehicle(DateTime? registrationDate, string? frameId, string? licensePlate)
+    public Vehicle(DateTime? registrationDate, string? frameId, string? licensePlate)
     {
         registrationDate = registrationDate?.Date;
 
@@ -27,7 +27,6 @@ public class Vehicle : BaseAggregate
 
         FrameId = frameId;
         LicensePlate = licensePlate;
-        Id = Guid.NewGuid();
     }
 
     /// <summary>
@@ -38,12 +37,12 @@ public class Vehicle : BaseAggregate
     /// <summary>
     ///     Gets Frame id.
     /// </summary>
-    public string FrameId { get; }
+    public string? FrameId { get; }
 
     /// <summary>
     ///     Gets License Plate.
     /// </summary>
-    public string LicensePlate { get; }
+    public string? LicensePlate { get; }
 
     /// <summary>
     ///     Factory, creates vehicle.
@@ -54,6 +53,11 @@ public class Vehicle : BaseAggregate
     /// <returns> a vehicle.</returns>
     public static Vehicle Create(DateTime? registrationDate, string? frameId, string? licensePlate)
     {
-        return new Vehicle(registrationDate, frameId, licensePlate);
+        var vehicle = new Vehicle(registrationDate, frameId, licensePlate)
+        {
+            Id = Guid.NewGuid()
+        };
+
+        return vehicle;
     }
 }
