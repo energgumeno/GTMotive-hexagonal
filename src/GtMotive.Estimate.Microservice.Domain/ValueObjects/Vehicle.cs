@@ -1,4 +1,5 @@
-﻿using GtMotive.Estimate.Microservice.Domain.Common;
+﻿using System.Text.Json.Serialization;
+using GtMotive.Estimate.Microservice.Domain.Common;
 
 namespace GtMotive.Estimate.Microservice.Domain.ValueObjects;
 
@@ -33,24 +34,27 @@ public class Vehicle : BaseAggregate
     ///     Initializes a new instance of the <see cref="Vehicle" /> class.
     ///     This constructor is for deserialization only.
     /// </summary>
-    private Vehicle()
+    public Vehicle()
     {
     }
 
     /// <summary>
     ///     Gets Registration date.
     /// </summary>
-    public DateTime RegistrationDate { get; }
+    [JsonInclude]
+    public DateTime RegistrationDate { get; private set; }
 
     /// <summary>
     ///     Gets Frame id.
     /// </summary>
-    public string? FrameId { get; }
+    [JsonInclude]
+    public string? FrameId { get; private set; }
 
     /// <summary>
     ///     Gets License Plate.
     /// </summary>
-    public string? LicensePlate { get; }
+    [JsonInclude]
+    public string? LicensePlate { get; private set; }
 
     /// <summary>
     ///     Factory, creates vehicle.

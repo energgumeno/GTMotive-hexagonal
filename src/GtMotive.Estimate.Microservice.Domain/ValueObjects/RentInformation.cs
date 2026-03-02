@@ -1,4 +1,5 @@
-﻿using GtMotive.Estimate.Microservice.Domain.Common;
+﻿using System.Text.Json.Serialization;
+using GtMotive.Estimate.Microservice.Domain.Common;
 using GtMotive.Estimate.Microservice.Domain.Enums;
 
 namespace GtMotive.Estimate.Microservice.Domain.ValueObjects;
@@ -31,19 +32,25 @@ public class RentInformation : BaseAggregate
     ///     Initializes a new instance of the <see cref="RentInformation" /> class.
     ///     This constructor is for deserialization only.
     /// </summary>
-    private RentInformation()
+    public RentInformation()
     {
     }
 
     //should be moved to user in a bounded context
+    [JsonInclude]
     public string Fullname { get; private set; }
+    [JsonInclude]
     public string Email { get; private set; }
 
     //should be moved to user in a bounded context
 
+    [JsonInclude]
     public Guid VehicleId { get; private set; }
+    [JsonInclude]
     public RentStatus Status { get; private set; }
+    [JsonInclude]
     public DateTime TimeRentStart { get; private set; }
+    [JsonInclude]
     public DateTime TimeRentEnd { get; private set; }
 
 
