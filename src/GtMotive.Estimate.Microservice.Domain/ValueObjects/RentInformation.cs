@@ -10,7 +10,8 @@ public class RentInformation : BaseAggregate
         string? email,
         DateTime? timeRentStart,
         DateTime? timeRentEnd,
-        Guid? vehicleId)
+        Guid? vehicleId,
+        RentStatus status)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(fullname);
         ArgumentException.ThrowIfNullOrWhiteSpace(email);
@@ -23,7 +24,15 @@ public class RentInformation : BaseAggregate
         TimeRentStart = timeRentStart ?? DateTime.Now;
         TimeRentEnd = timeRentEnd ?? DateTime.Now;
         VehicleId = vehicleId ?? Guid.Empty;
-        Status = RentStatus.New;
+        Status = status;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RentInformation"/> class.
+    /// This constructor is for deserialization only.
+    /// </summary>
+    private RentInformation()
+    {
     }
 
     //should be moved to user in a bounded context
@@ -50,7 +59,8 @@ public class RentInformation : BaseAggregate
             email,
             timeRentStart,
             timeRentEnd,
-            vehicleId)
+            vehicleId,
+            RentStatus.New)
         {
             Id = Guid.NewGuid()
         };

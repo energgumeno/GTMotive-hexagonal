@@ -12,5 +12,6 @@ public class ProcessRentReturnedCase(IRentVehiclePort rentVehiclePort) : IUseCas
         VehicleRentAggregate.ReturnVehicle(rent);
 
         await rentVehiclePort.UpdateVehicleRent(rent);
+        await rentVehiclePort.Save();
     }
 }

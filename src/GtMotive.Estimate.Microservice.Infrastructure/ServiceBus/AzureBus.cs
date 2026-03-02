@@ -16,7 +16,11 @@ public class AzureBus : IBus
     public async Task Send(object message)
     {
         var messageBody = JsonSerializer.Serialize(message);
-        var serviceBusMessage = new ServiceBusMessage(messageBody);
+        var serviceBusMessage = new ServiceBusMessage(messageBody)
+        {
+            ContentType = "application/json"
+        };
+        serviceBusMessage.ApplicationProperties.Add("MessageType", message.GetType().Name);
         await _sender.SendMessageAsync(serviceBusMessage);
     }
 }

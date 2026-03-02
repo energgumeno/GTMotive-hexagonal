@@ -38,7 +38,7 @@ public class ReturnVehicleCase(
             telemetry.TrackEvent(nameof(ReturnVehicleCommand),
                 new Dictionary<string, string> { { nameof(ReturnVehicleCommand), "Start..." } });
 
-            var vehicleRent = await rentVehiclePort.GetVehicleRent(request.RentId.Value);
+            var vehicleRent = await rentVehiclePort.GetVehicleRentByRentId(request.RentId.Value);
             if (vehicleRent == null)
             {
                 outputPortNotFound.NotFoundHandle($"Vehicle rent with id {request.RentId.Value} not found");

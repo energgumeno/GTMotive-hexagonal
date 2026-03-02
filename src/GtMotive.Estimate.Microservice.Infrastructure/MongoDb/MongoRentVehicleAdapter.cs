@@ -1,3 +1,4 @@
+using GtMotive.Estimate.Microservice.Domain.Enums;
 using GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
 using GtMotive.Estimate.Microservice.Domain.ValueObjects;
 using GtMotive.Estimate.Microservice.Infrastructure.MongoDb.Settings;
@@ -26,11 +27,16 @@ public class MongoRentVehicleAdapter : IRentVehiclePort
 
         return (rents.Cast<RentInformation?>().ToList(), totalCount);
     }
+    
 
-    public async Task<RentInformation?> GetVehicleRent(Guid vehicleId)
+    public async Task<RentInformation?> GetVehicleRentByRentId(Guid rentId)
     {
-        var result = await _collection.Find(r => r.VehicleId == vehicleId).FirstOrDefaultAsync();
-        return result?.VehicleId == vehicleId ? result : null;
+        var result = await _collection.Find(r => r.Id == rentId).FirstOrDefaultAsync();
+        return result?.Id == rentId ? result : null;
+    }
+    public async Task<List<RentInformation>> GetVehiclesRentByVehicleId(Guid vehicleId)
+    {
+        return  await _collection.Find(r => r.VehicleId == vehicleId && (r.Status!=RentStatus.Returned ||r.Status==RentStatus.Cancelled)).ToListAsync();
     }
 
     public async Task<RentInformation?> GetVehicleRent(string email)

@@ -1,7 +1,9 @@
 ﻿using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.RentVehicle.Commands;
+using GtMotive.Estimate.Microservice.Domain.Enums;
 using GtMotive.Estimate.Microservice.Domain.Events;
 using GtMotive.Estimate.Microservice.Domain.Interfaces;
 using GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
+using GtMotive.Estimate.Microservice.Domain.ValueObjects;
 using GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates;
 
 namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.RentVehicle.Case;
@@ -62,26 +64,19 @@ public class RentVehicleCase(
                 new Dictionary<string, string> { { nameof(RentVehicleCase), "Start..." } });
 
             var rentVehicle = await rentVehiclePort.GetVehicleRent(request.Email);
-            if (rentVehicle != null)
+            if (rentVehicle != null &&
+                (rentVehicle.Status != RentStatus.Cancelled || rentVehicle.Status != RentStatus.Returned))
             {
                 outputPortNotFound.NotFoundHandle($"{request.Email} has already a Lease.");
                 return;
             }
 
-            rentVehicle = await rentVehiclePort.GetVehicleRent(request.VehicleId.Value);
-            if (rentVehicle != null && request.TimeRentStart.Value <= rentVehicle.TimeRentStart &&
-                rentVehicle.TimeRentStart <= request.TimeRentEnd.Value)
+            List<RentInformation> reservations = await rentVehiclePort.GetVehiclesRentByVehicleId(request.VehicleId.Value) ?? new List<RentInformation>();
+            foreach (var current  in reservations)
             {
-                outputPortNotFound.NotFoundHandle($"{nameof(rentVehicle.TimeRentStart)} is not available");
-                return;
+                if (!CheckVehicleAvailability(request, current)) return;                
             }
 
-            if (rentVehicle != null && request.TimeRentStart.Value <= rentVehicle.TimeRentEnd &&
-                rentVehicle.TimeRentStart <= request.TimeRentEnd.Value)
-            {
-                outputPortNotFound.NotFoundHandle($"{nameof(rentVehicle.TimeRentEnd)} is not available");
-                return;
-            }
 
             await rentVehiclePort.AddVehicleRent(vehicleRentAggregate.RentVehicleInformation!);
             foreach (var vehicleRentAggregateDomainEvent in vehicleRentAggregate.DomainEvents)
@@ -92,5 +87,32 @@ public class RentVehicleCase(
         }
 
         outputPortStandard.StandardHandle(new RentVehicleResponse(vehicleRentAggregate.RentVehicleInformation!.Id));
+    }
+
+    private bool CheckVehicleAvailability(RentVehicleCommand request, RentInformation? rentVehicle)
+    {
+        if (rentVehicle != null &&
+            request.TimeRentStart != null &&
+            request.TimeRentStart.Value <= rentVehicle.TimeRentStart &&
+            request.TimeRentEnd != null &&
+            rentVehicle.TimeRentStart <= request.TimeRentEnd.Value)
+        {
+            outputPortNotFound.NotFoundHandle(
+                $"the vehicle is not available in that {nameof(rentVehicle.TimeRentStart)} ");
+            return false;
+        }
+
+        if (rentVehicle != null &&
+            request.TimeRentStart != null &&
+            request.TimeRentStart.Value <= rentVehicle.TimeRentEnd &&
+            request.TimeRentEnd != null &&
+            rentVehicle.TimeRentStart <= request.TimeRentEnd.Value)
+        {
+            outputPortNotFound.NotFoundHandle(
+                $"the vehicle is not available in that {nameof(rentVehicle.TimeRentEnd)}");
+            return false;
+        }
+
+        return true;
     }
 }

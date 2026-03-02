@@ -43,48 +43,72 @@ public class ServiceBusReceiverWorker : BackgroundService
         await _processor.StopProcessingAsync(stoppingToken);
     }
 
+    private static readonly JsonSerializerOptions SerializationOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     private async Task MessageHandler(ProcessMessageEventArgs args)
     {
         var body = args.Message.Body.ToString();
         _logger.LogInformation("Received message: {Body}", body);
 
+        if (!args.Message.ApplicationProperties.TryGetValue("MessageType", out var messageTypeHeader) ||
+            messageTypeHeader is not string messageType)
+        {
+            _logger.LogWarning("Message received without MessageType header. Body: {Body}", body);
+            await args.CompleteMessageAsync(args.Message);
+            return;
+        }
+
         try
         {
             using var scope = _serviceProvider.CreateScope();
-            var jsonDocument = JsonDocument.Parse(body);
-            
-            // Determinar tipo de mensaje basado en estructura
-            if (jsonDocument.RootElement.TryGetProperty("RentInformation", out _))
+
+            switch (messageType)
             {
-                if (body.Contains("RentVehicleReturnedEvent"))
-                {
-                    var returnedEvent = JsonSerializer.Deserialize<RentVehicleReturnedEvent>(body);
+                case nameof(RentVehicleReturnedEvent):
+                    var returnedEvent = JsonSerializer.Deserialize<RentVehicleReturnedEvent>(body, SerializationOptions);
                     if (returnedEvent != null)
                     {
                         var useCase = scope.ServiceProvider.GetRequiredService<IUseCase<ProcessRentReturnedCommand>>();
                         await useCase.Execute(new ProcessRentReturnedCommand(returnedEvent));
                     }
-                }
-                else
-                {
-                    var createdEvent = JsonSerializer.Deserialize<RentVehicleCreatedEvent>(body);
+                    else
+                    {
+                        _logger.LogWarning("Deserialization failed for {MessageType}. Body: {Body}", messageType, body);
+                    }
+
+                    break;
+
+                case nameof(RentVehicleCreatedEvent):
+                    var createdEvent = JsonSerializer.Deserialize<RentVehicleCreatedEvent>(body, SerializationOptions);
                     if (createdEvent != null)
                     {
                         var useCase = scope.ServiceProvider.GetRequiredService<IUseCase<ProcessRentCreatedCommand>>();
                         await useCase.Execute(new ProcessRentCreatedCommand(createdEvent));
                     }
-                }
-            }
-            else if (body.Contains("VehicleCreatedEvent"))
-            {
-                _logger.LogInformation("VehicleCreatedEvent received, skipping as requested.");
+                    else
+                    {
+                        _logger.LogWarning("Deserialization failed for {MessageType}. Body: {Body}", messageType, body);
+                    }
+
+                    break;
+
+                case nameof(VehicleCreatedEvent):
+                    _logger.LogInformation("VehicleCreatedEvent received, skipping as requested.");
+                    break;
+
+                default:
+                    _logger.LogWarning("Unknown MessageType: {MessageType}", messageType);
+                    break;
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error processing message body: {Body}", body);
+            _logger.LogError(ex, "Error processing message with type {MessageType} and body: {Body}", messageType, body);
         }
-        
+
         await args.CompleteMessageAsync(args.Message);
     }
 

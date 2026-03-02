@@ -62,7 +62,7 @@ public class MongoService
                 cm.MapProperty(r => r.TimeRentStart);
                 cm.MapProperty(r => r.TimeRentEnd);
 
-                cm.MapCreator(r => new RentInformation(r.Fullname, r.Email, r.TimeRentStart, r.TimeRentEnd, r.VehicleId));
+                cm.MapCreator(r => new RentInformation(r.Fullname, r.Email, r.TimeRentStart, r.TimeRentEnd, r.VehicleId, r.Status));
             });
         }
     }

@@ -56,6 +56,7 @@ namespace GtMotive.Estimate.Microservice.FunctionalTests
 
             _vehiclePortMock.Setup(v => v.GetVehicle(vehicleId)).ReturnsAsync(vehicle);
             _rentVehiclePortMock.Setup(r => r.GetVehicleRent(command.Email!)).ReturnsAsync((RentInformation?)null);
+            _rentVehiclePortMock.Setup(r => r.GetVehiclesRentByVehicleId(vehicleId)).ReturnsAsync(new List<RentInformation>());
 
             // Act
             await _useCase.Execute(command);

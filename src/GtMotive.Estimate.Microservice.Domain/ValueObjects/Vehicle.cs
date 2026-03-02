@@ -30,6 +30,14 @@ public class Vehicle : BaseAggregate
     }
 
     /// <summary>
+    ///     Initializes a new instance of the <see cref="Vehicle" /> class.
+    ///     This constructor is for deserialization only.
+    /// </summary>
+    private Vehicle()
+    {
+    }
+
+    /// <summary>
     ///     Gets Registration date.
     /// </summary>
     public DateTime RegistrationDate { get; }

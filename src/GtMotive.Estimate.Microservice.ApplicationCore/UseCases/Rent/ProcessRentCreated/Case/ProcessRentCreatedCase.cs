@@ -11,11 +11,14 @@ public class ProcessRentCreatedCase(IRentVehiclePort rentVehiclePort) : IUseCase
         var newRent = request.Event.RentInformation;
 
         // Obtener todas las rentas para el mismo vehículo
-        var (allRents, _) = await rentVehiclePort.GetVehiclesRent(0, 1000); // Simplificación, idealmente un método específico en el puerto
-        
+        var allRents =
+            await rentVehiclePort
+                .GetVehiclesRentByVehicleId(newRent
+                    .VehicleId); // Simplificación, idealmente un método específico en el puerto
+
         var conflictingRents = allRents
-            .Where(r => r != null && 
-                        r.VehicleId == newRent.VehicleId && 
+            .Where(r => 
+                        r.VehicleId == newRent.VehicleId &&
                         r.Id != newRent.Id &&
                         r.Status == RentStatus.Accepted &&
                         ((newRent.TimeRentStart >= r.TimeRentStart && newRent.TimeRentStart <= r.TimeRentEnd) ||
@@ -33,5 +36,6 @@ public class ProcessRentCreatedCase(IRentVehiclePort rentVehiclePort) : IUseCase
         }
 
         await rentVehiclePort.UpdateVehicleRent(newRent);
+        await rentVehiclePort.Save();
     }
 }
