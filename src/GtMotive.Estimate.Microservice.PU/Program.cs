@@ -1,9 +1,7 @@
-using GtMotive.Estimate.Microservice.Api.UseCases.Fleet.AddVehicle.Handlers;
 using GtMotive.Estimate.Microservice.ApplicationCore.DependencyInjection;
 using GtMotive.Estimate.Microservice.Infrastructure.DependencyInjection;
 using GtMotive.Estimate.Microservice.PU;
 using GtMotive.Estimate.Microservice.PU.Handlers;
-using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +11,6 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplicationCore();
-builder.Services.AddMediatR(typeof(AddVehicleHandler).Assembly);
 builder.Services.AddHostedService<ServiceBusReceiverWorker>();
 
 var app = builder.Build();
