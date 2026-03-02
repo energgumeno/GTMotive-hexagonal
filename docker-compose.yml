@@ -1,0 +1,58 @@
+﻿services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  servicebus-emulator:
+    image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
+    ports:
+      - "5672:5672"
+      - "9030:9030"
+    environment:
+      - ACCEPT_EULA=Y
+      - SQL_SERVER_FQDN=sqlserver
+      - MSSQL_SA_PASSWORD=YourPassword123!
+    depends_on:
+      - sqlserver
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourPassword123!
+
+  host:
+    build:
+      context: .
+      dockerfile: src/GtMotive.Estimate.Microservice.Host/Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDb__ConnectionString=mongodb://mongodb:27017
+      - MongoDb__MongoDbDatabaseName=GtMotiveEstimate
+      - ServiceBus__ConnectionString=Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;
+      - ServiceBus__QueueName=estimates-queue
+    depends_on:
+      - mongodb
+      - servicebus-emulator
+
+  pu:
+    build:
+      context: .
+      dockerfile: src/GtMotive.Estimate.Microservice.PU/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDb__ConnectionString=mongodb://mongodb:27017
+      - MongoDb__MongoDbDatabaseName=GtMotiveEstimate
+      - ServiceBus__ConnectionString=Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;
+      - ServiceBus__QueueName=estimates-queue
+    depends_on:
+      - mongodb
+      - servicebus-emulator
+
+volumes:
+  mongodb_data:
