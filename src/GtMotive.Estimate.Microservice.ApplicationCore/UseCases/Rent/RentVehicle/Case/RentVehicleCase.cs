@@ -68,6 +68,21 @@ public class RentVehicleCase(
                 return;
             }
 
+            rentVehicle = await rentVehiclePort.GetVehicleRent(request.VehicleId.Value);
+            if (rentVehicle != null && request.TimeRentStart.Value <= rentVehicle.TimeRentStart &&
+                rentVehicle.TimeRentStart <= request.TimeRentEnd.Value)
+            {
+                outputPortNotFound.NotFoundHandle($"{nameof(rentVehicle.TimeRentStart)} is not available");
+                return;
+            }
+
+            if (rentVehicle != null && request.TimeRentStart.Value <= rentVehicle.TimeRentEnd &&
+                rentVehicle.TimeRentStart <= request.TimeRentEnd.Value)
+            {
+                outputPortNotFound.NotFoundHandle($"{nameof(rentVehicle.TimeRentEnd)} is not available");
+                return;
+            }
+
             await rentVehiclePort.AddVehicleRent(vehicleRentAggregate.RentVehicleInformation!);
             foreach (var vehicleRentAggregateDomainEvent in vehicleRentAggregate.DomainEvents)
                 await bus.Send(vehicleRentAggregateDomainEvent);

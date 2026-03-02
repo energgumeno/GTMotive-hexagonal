@@ -29,12 +29,14 @@ public class MongoVehicleAdapter : IVehiclePort
 
     public async Task<Vehicle?> GetVehicle(Guid vehicleId)
     {
-        return await _collection.Find(v => v.Id == vehicleId).FirstOrDefaultAsync();
+        var ret= await _collection.Find(v => v.Id == vehicleId).FirstOrDefaultAsync();
+        return ret?.Id == vehicleId ? ret : null;
     }
 
     public async Task<Vehicle?> GetVehicle(Vehicle vehicle)
     {
-        return await _collection.Find(v => v.LicensePlate == vehicle.LicensePlate || v.FrameId == vehicle.FrameId).FirstOrDefaultAsync();
+        var ret= await _collection.Find(v => v.LicensePlate == vehicle.LicensePlate || v.FrameId == vehicle.FrameId).FirstOrDefaultAsync();
+        return ret?.LicensePlate == vehicle.LicensePlate || ret?.FrameId == vehicle.FrameId ? ret : null;
     }
 
     public async Task<Guid> AddVehicle(Vehicle vehicle)
@@ -45,14 +47,12 @@ public class MongoVehicleAdapter : IVehiclePort
 
     public Task<int> Save()
     {
-        // En MongoDB, las operaciones de escritura individuales son atómicas y persisten inmediatamente.
-        // Si no se usa una sesión de cliente para transacciones multi-documento, simplemente devolvemos 1.
         return Task.FromResult(1);
     }
 
     public void Dispose()
     {
-        // No es necesario liberar recursos específicos de MongoDB aquí
+        
         GC.SuppressFinalize(this);
     }
 }

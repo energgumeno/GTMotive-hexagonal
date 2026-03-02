@@ -20,7 +20,7 @@
       - ASPNETCORE_URLS=http://+:8080
       - MongoDb__ConnectionString=mongodb://mongodb:27017
       - MongoDb__MongoDbDatabaseName=GtMotiveEstimate
-      - ServiceBus__ConnectionString=Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;
+      - ServiceBus__ConnectionString=Endpoint=sb://host.docker.internal;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;
       - ServiceBus__QueueName=estimates-queue
     depends_on:
       - mongodb
@@ -36,7 +36,7 @@
       - ASPNETCORE_ENVIRONMENT=Development
       - MongoDb__ConnectionString=mongodb://mongodb:27017
       - MongoDb__MongoDbDatabaseName=GtMotiveEstimate
-      - ServiceBus__ConnectionString=Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;
+      - ServiceBus__ConnectionString=Endpoint=sb://host.docker.internal;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;
       - ServiceBus__QueueName=estimates-queue
     depends_on:
       - mongodb
