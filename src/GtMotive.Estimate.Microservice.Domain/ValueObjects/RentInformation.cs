@@ -82,14 +82,14 @@ public class RentInformation : BaseAggregate
 
     public void Cancel()
     {
-        if (Status != RentStatus.New)
+        if (Status == RentStatus.New)
             throw new InvalidOperationException("Cannot cancel rent if status is not New");
         Status = RentStatus.Cancelled;
     }
 
     public void ReturnVehicle()
     {
-        if (Status != RentStatus.Accepted)
+        if (Status != RentStatus.Accepted && Status != RentStatus.Cancelled)
             throw new InvalidOperationException("Cannot return vehicle if rent is not accepted");
         Status = RentStatus.Returned;
     }

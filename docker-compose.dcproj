@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.Docker.Sdk">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>81dded9d-158b-e303-5f62-77a2896d2a5a</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <DockerComposeProject>true</DockerComposeProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="global.json" />
+    <None Remove="ServiceBusConfig.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="docker-compose.yml" />
+  </ItemGroup>
+</Project>
