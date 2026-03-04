@@ -6,6 +6,8 @@ namespace GtMotive.Estimate.Microservice.Domain.ValueObjects;
 
 public class RentInformation : BaseAggregate
 {
+    const string TimeRentStartBiggerTimeRentEnd = "TimeRentStart must be less than TimeRentEnd"
+
     public RentInformation(
         string fullname,
         string? email,
@@ -19,6 +21,7 @@ public class RentInformation : BaseAggregate
         if (!timeRentStart.HasValue) throw new ArgumentNullException(nameof(timeRentStart));
         if (!timeRentEnd.HasValue) throw new ArgumentNullException(nameof(timeRentEnd));
         if (!vehicleId.HasValue) throw new ArgumentNullException(nameof(vehicleId));
+        if (timeRentStart > timeRentEnd) throw new ArgumentException(TimeRentStartBiggerTimeRentEnd);
 
         Fullname = fullname;
         Email = email;
@@ -37,21 +40,15 @@ public class RentInformation : BaseAggregate
     }
 
     //should be moved to user in a bounded context
-    [JsonInclude]
-    public string Fullname { get; private set; }
-    [JsonInclude]
-    public string Email { get; private set; }
+    [JsonInclude] public string Fullname { get; private set; }
+    [JsonInclude] public string Email { get; private set; }
 
     //should be moved to user in a bounded context
 
-    [JsonInclude]
-    public Guid VehicleId { get; private set; }
-    [JsonInclude]
-    public RentStatus Status { get; private set; }
-    [JsonInclude]
-    public DateTime TimeRentStart { get; private set; }
-    [JsonInclude]
-    public DateTime TimeRentEnd { get; private set; }
+    [JsonInclude] public Guid VehicleId { get; private set; }
+    [JsonInclude] public RentStatus Status { get; private set; }
+    [JsonInclude] public DateTime TimeRentStart { get; private set; }
+    [JsonInclude] public DateTime TimeRentEnd { get; private set; }
 
 
     public static RentInformation Create(
@@ -92,5 +89,29 @@ public class RentInformation : BaseAggregate
         if (Status != RentStatus.Accepted && Status != RentStatus.Cancelled)
             throw new InvalidOperationException("Cannot return vehicle if rent is not accepted");
         Status = RentStatus.Returned;
+    }
+
+    public void ValidateExistingLease(RentInformation rentVehicle)
+    {
+        if (rentVehicle.Status is not (RentStatus.Cancelled or RentStatus.Returned))
+        {
+            throw new InvalidOperationException($"{rentVehicle.Email} has already a Lease.");
+        }
+    }
+
+    public void ValidateVehicleAvailability(DateTime newTimeRentStart, DateTime newTimeRentEnd)
+    {
+
+        if (newTimeRentStart <= TimeRentStart &&
+            TimeRentStart <= TimeRentEnd)
+        {
+            throw new InvalidOperationException($"the vehicle is not available in that {nameof(TimeRentStart)}. ");
+        }
+
+        if (newTimeRentEnd <= TimeRentEnd &&
+            TimeRentStart <= TimeRentEnd)
+        {
+            throw new InvalidOperationException($"the vehicle is not available in that {nameof(TimeRentEnd)}. ");
+        }
     }
 }

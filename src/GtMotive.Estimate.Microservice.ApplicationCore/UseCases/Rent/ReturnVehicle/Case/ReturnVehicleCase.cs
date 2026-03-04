@@ -33,28 +33,27 @@ public class ReturnVehicleCase(
 
         var bus = busFactory.GetClient(typeof(ReturnVehicleCase));
 
-        using (rentVehiclePort)
+
+        telemetry.TrackEvent(nameof(ReturnVehicleCommand),
+            new Dictionary<string, string> { { nameof(ReturnVehicleCommand), "Start..." } });
+
+        var vehicleRent = await rentVehiclePort.GetVehicleRentByRentId(request.RentId.Value);
+        if (vehicleRent == null)
         {
-            telemetry.TrackEvent(nameof(ReturnVehicleCommand),
-                new Dictionary<string, string> { { nameof(ReturnVehicleCommand), "Start..." } });
-
-            var vehicleRent = await rentVehiclePort.GetVehicleRentByRentId(request.RentId.Value);
-            if (vehicleRent == null)
-            {
-                outputPortNotFound.NotFoundHandle($"Vehicle rent with id {request.RentId.Value} not found");
-                return;
-            }
-
-
-            var vehicleRentAggregate = VehicleRentAggregate.ReturnVehicle(vehicleRent);
-            await rentVehiclePort.UpdateVehicleRent(vehicleRentAggregate.RentVehicleInformation!);
-
-            foreach (var vehicleRentAggregateDomainEvent in vehicleRentAggregate.DomainEvents)
-                await bus.Send(vehicleRentAggregateDomainEvent);
-
-            telemetry.TrackEvent(nameof(ReturnVehicleCommand),
-                new Dictionary<string, string> { { nameof(ReturnVehicleCommand), "End..." } });
+            outputPortNotFound.NotFoundHandle($"Vehicle rent with id {request.RentId.Value} not found");
+            return;
         }
+
+
+        var vehicleRentAggregate = VehicleRentAggregate.ReturnVehicle(vehicleRent);
+        await rentVehiclePort.UpdateVehicleRent(vehicleRentAggregate.RentVehicleInformation!);
+
+        foreach (var vehicleRentAggregateDomainEvent in vehicleRentAggregate.DomainEvents)
+            await bus.Send(vehicleRentAggregateDomainEvent);
+
+        telemetry.TrackEvent(nameof(ReturnVehicleCommand),
+            new Dictionary<string, string> { { nameof(ReturnVehicleCommand), "End..." } });
+
 
         outputPortStandard.StandardHandle(new ReturnVehicleResponse(request.RentId.Value));
     }

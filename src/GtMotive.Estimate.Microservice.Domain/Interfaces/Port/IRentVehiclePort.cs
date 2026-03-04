@@ -7,7 +7,7 @@ public interface IRentVehiclePort : IUnitOfWork
     Task<(List<RentInformation?>, int)> GetVehiclesRent(int pageIndex, int pageSize);
     Task<RentInformation?> GetVehicleRentByRentId(Guid vehicleId);
     Task<List<RentInformation>> GetVehiclesRentByVehicleId(Guid vehicleId);
-    Task<RentInformation?> GetVehicleRent(string email);
+    Task<List<RentInformation>> GetVehicleRentByEmail(string email);
     Task<Guid?> AddVehicleRent(RentInformation rentInformation);
     Task<Guid?> UpdateVehicleRent(RentInformation rentInformation);
 }

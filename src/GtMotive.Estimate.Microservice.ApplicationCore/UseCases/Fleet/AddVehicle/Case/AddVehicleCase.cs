@@ -41,24 +41,22 @@ public class AddVehicleCase(
             request.LicensePlate);
 
 
-        using (vehiclePort)
+        telemetry.TrackEvent(nameof(AddVehicleCase),
+            new Dictionary<string, string> { { "AddVehicleCase", "Start..." } });
+
+        var vehicle = await vehiclePort.GetVehicle(vehicleAggregate.CurrentVehicle!);
+        if (vehicle != null)
         {
-            telemetry.TrackEvent(nameof(AddVehicleCase),
-                new Dictionary<string, string> { { "AddVehicleCase", "Start..." } });
-
-            var vehicle = await vehiclePort.GetVehicle(vehicleAggregate.CurrentVehicle!);
-            if (vehicle != null)
-            {
-                outputPortNotFound.NotFoundHandle("vehicle already exists");
-                return;
-            }
-
-            vehicleId = await vehiclePort.AddVehicle(vehicleAggregate.CurrentVehicle!)!;
-            await vehiclePort.Save();
-
-            foreach (var vehicleAggregateDomainEvent in vehicleAggregate.DomainEvents)
-                await bus.Send(vehicleAggregateDomainEvent);
+            outputPortNotFound.NotFoundHandle("vehicle already exists");
+            return;
         }
+
+        vehicleId = await vehiclePort.AddVehicle(vehicleAggregate.CurrentVehicle!)!;
+        await vehiclePort.Save();
+
+        foreach (var vehicleAggregateDomainEvent in vehicleAggregate.DomainEvents)
+            await bus.Send(vehicleAggregateDomainEvent);
+
 
         telemetry.TrackEvent(nameof(AddVehicleCase),
             new Dictionary<string, string> { { "AddVehicleCase", "End..." } });

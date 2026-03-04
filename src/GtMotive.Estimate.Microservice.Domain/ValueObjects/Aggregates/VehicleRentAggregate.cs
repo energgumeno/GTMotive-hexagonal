@@ -12,15 +12,35 @@ public class VehicleRentAggregate : EntityBase
         string? email,
         DateTime? timeRentStart,
         DateTime? timeRentEnd,
-        Guid? vehicleId)
+        Vehicle? vehicle,
+        List<RentInformation> rentVehicleByEmail,
+        List<RentInformation> activeRentsInformation)
     {
+        
+        if (vehicle == null)
+        {
+            throw new ArgumentException ($"Vehicle with not found");
+        }
+        
         var vehicleRentAggregate = new VehicleRentAggregate();
         vehicleRentAggregate.RentVehicleInformation = RentInformation.Create(
             fullname,
             email,
             timeRentStart,
             timeRentEnd,
-            vehicleId);
+            vehicle.Id);
+        foreach (var activeRent in activeRentsInformation)
+        {
+            activeRent.ValidateExistingLease(email, activeRent);
+        }
+
+        foreach (var activeRent in activeRentsInformation)
+        {
+            
+            activeRent.ValidateVehicleAvailability( timeRentStart,  timeRentEnd);
+        }
+        
+        
         vehicleRentAggregate.AddDomainEvent(
             new RentVehicleCreatedEvent(vehicleRentAggregate.RentVehicleInformation));
         return vehicleRentAggregate;
@@ -30,7 +50,7 @@ public class VehicleRentAggregate : EntityBase
     {
         var aggregate = new VehicleRentAggregate { RentVehicleInformation = rentInformation };
         aggregate.RentVehicleInformation.Accept();
-        // aggregate.AddDomainEvent(new RentVehicleAcceptedEvent(rentInformation)); // Opcional si se requiere un evento de salida
+       //  aggregate.AddDomainEvent(new RentVehicleAcceptedEvent(rentInformation));//todo 
         return aggregate;
     }
 

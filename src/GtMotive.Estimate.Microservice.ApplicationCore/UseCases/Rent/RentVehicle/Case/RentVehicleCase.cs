@@ -39,80 +39,32 @@ public class RentVehicleCase(
         if (!request.TimeRentEnd.HasValue) throw new ArgumentNullException(nameof(request.TimeRentEnd));
         if (!request.VehicleId.HasValue) throw new ArgumentNullException(nameof(request.VehicleId));
 
+        telemetry.TrackEvent(nameof(RentVehicleCase),
+            new Dictionary<string, string> { { nameof(RentVehicleCase), "Start..." } });
 
-        var bus = busFactory.GetClient(typeof(VehicleCreatedEvent));
-        using (vehiclePort)
-        {
-            var vehicle = await vehiclePort.GetVehicle(request.VehicleId.Value);
-            if (vehicle == null)
-            {
-                outputPortNotFound.NotFoundHandle($"Vehicle with id {request.VehicleId.Value} not found");
-                return;
-            }
-        }
+        var vehicle = await vehiclePort.GetVehicle(request.VehicleId.Value);
+        var rentVehicleByEmail = await rentVehiclePort.GetVehicleRentByEmail(request.Email);
+        var reservations = await rentVehiclePort.GetVehiclesRentByVehicleId(request.VehicleId.Value);
 
         var vehicleRentAggregate = VehicleRentAggregate.Create(
             request.Fullname,
             request.Email,
             request.TimeRentStart,
             request.TimeRentEnd,
-            request.VehicleId);
+            vehicle,
+            rentVehicleByEmail,
+            reservations);
+        
+        await rentVehiclePort.AddVehicleRent(vehicleRentAggregate.RentVehicleInformation!);
+        
+        var bus = busFactory.GetClient(typeof(VehicleCreatedEvent));
+        foreach (var vehicleRentAggregateDomainEvent in vehicleRentAggregate.DomainEvents)
+            await bus.Send(vehicleRentAggregateDomainEvent);
 
-        using (rentVehiclePort)
-        {
-            telemetry.TrackEvent(nameof(RentVehicleCase),
-                new Dictionary<string, string> { { nameof(RentVehicleCase), "Start..." } });
+        telemetry.TrackEvent(nameof(RentVehicleCase),
+            new Dictionary<string, string> { { nameof(RentVehicleCase), "End..." } });
 
-            var rentVehicle = await rentVehiclePort.GetVehicleRent(request.Email);
-            if (rentVehicle != null &&
-                (rentVehicle.Status != RentStatus.Cancelled || rentVehicle.Status != RentStatus.Returned))
-            {
-                outputPortNotFound.NotFoundHandle($"{request.Email} has already a Lease.");
-                return;
-            }
-
-            var reservations = await rentVehiclePort.GetVehiclesRentByVehicleId(request.VehicleId.Value) ??
-                               new List<RentInformation>();
-            foreach (var current in reservations)
-                if (!CheckVehicleAvailability(request, current))
-                    return;
-
-
-            await rentVehiclePort.AddVehicleRent(vehicleRentAggregate.RentVehicleInformation!);
-            foreach (var vehicleRentAggregateDomainEvent in vehicleRentAggregate.DomainEvents)
-                await bus.Send(vehicleRentAggregateDomainEvent);
-
-            telemetry.TrackEvent(nameof(RentVehicleCase),
-                new Dictionary<string, string> { { nameof(RentVehicleCase), "End..." } });
-        }
 
         outputPortStandard.StandardHandle(new RentVehicleResponse(vehicleRentAggregate.RentVehicleInformation!.Id));
-    }
-
-    private bool CheckVehicleAvailability(RentVehicleCommand request, RentInformation? rentVehicle)
-    {
-        if (rentVehicle != null &&
-            request.TimeRentStart != null &&
-            request.TimeRentStart.Value <= rentVehicle.TimeRentStart &&
-            request.TimeRentEnd != null &&
-            rentVehicle.TimeRentStart <= request.TimeRentEnd.Value)
-        {
-            outputPortNotFound.NotFoundHandle(
-                $"the vehicle is not available in that {nameof(rentVehicle.TimeRentStart)} ");
-            return false;
-        }
-
-        if (rentVehicle != null &&
-            request.TimeRentStart != null &&
-            request.TimeRentStart.Value <= rentVehicle.TimeRentEnd &&
-            request.TimeRentEnd != null &&
-            rentVehicle.TimeRentStart <= request.TimeRentEnd.Value)
-        {
-            outputPortNotFound.NotFoundHandle(
-                $"the vehicle is not available in that {nameof(rentVehicle.TimeRentEnd)}");
-            return false;
-        }
-
-        return true;
     }
 }
