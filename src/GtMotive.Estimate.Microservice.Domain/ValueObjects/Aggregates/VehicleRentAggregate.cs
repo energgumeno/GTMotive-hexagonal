@@ -16,10 +16,7 @@ public class VehicleRentAggregate : EntityBase
         List<RentInformation> rentVehicleByEmail,
         List<RentInformation> activeRentsInformation)
     {
-        if (vehicle == null)
-        {
-            throw new ArgumentException($"Vehicle not found");
-        }
+        if (vehicle == null) throw new ArgumentException("Vehicle not found");
 
         var vehicleRentAggregate = new VehicleRentAggregate();
         vehicleRentAggregate.RentVehicleInformation = RentInformation.Create(
@@ -28,15 +25,10 @@ public class VehicleRentAggregate : EntityBase
             timeRentStart,
             timeRentEnd,
             vehicle.Id);
-        foreach (var activeRent in rentVehicleByEmail)
-        {
-            activeRent.ValidateFinishedLease();
-        }
+        foreach (var activeRent in rentVehicleByEmail) activeRent.ValidateFinishedLease();
 
         foreach (var activeRent in activeRentsInformation)
-        {
             activeRent.ValidateVehicleAvailability(timeRentStart, timeRentEnd);
-        }
 
         vehicleRentAggregate.AddDomainEvent(
             new RentVehicleCreatedEvent(vehicleRentAggregate.RentVehicleInformation));

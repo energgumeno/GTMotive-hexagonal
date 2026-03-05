@@ -40,8 +40,8 @@ public class AddVehicleCase(
                 new Dictionary<string, string> { { "AddVehicleCase", "Start..." } });
 
             var existingVehicle = await vehiclePort.GetVehicle(vehicle =>
-                vehicle.FrameId == request.FrameId 
-                );
+                vehicle.FrameId == request.FrameId
+            );
 
             var vehicleAggregate = VehicleAggregate.Create(
                 request.RegistrationDate,

@@ -13,9 +13,9 @@ public class RentVehicleFunctionalTests
 {
     private readonly Mock<IBusFactory> _busFactoryMock;
     private readonly Mock<IBus> _busMock;
-    private readonly Mock<IOutputPortStandard<RentVehicleResponse>> _outputPortStandardMock;
     private readonly Mock<IErrorOutputPort> _errorOutputPortMock;
     private readonly Mock<IAppLogger<RentVehicleCase>> _loggerMock;
+    private readonly Mock<IOutputPortStandard<RentVehicleResponse>> _outputPortStandardMock;
     private readonly Mock<IRentVehiclePort> _rentVehiclePortMock;
     private readonly Mock<ITelemetry> _telemetryMock;
     private readonly RentVehicleCase _useCase;

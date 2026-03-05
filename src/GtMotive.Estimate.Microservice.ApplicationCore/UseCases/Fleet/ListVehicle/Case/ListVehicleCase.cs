@@ -1,7 +1,6 @@
 ﻿using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehicle.Commands;
 using GtMotive.Estimate.Microservice.Domain.Interfaces;
 using GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
-using GtMotive.Estimate.Microservice.Domain.ValueObjects;
 
 namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehicle.Case;
 
@@ -31,9 +30,10 @@ public class ListVehicleCase(
         try
         {
             if (request.PageIndex < 0 || request.PageSize < 1)
-                request = new ListVehicleCommand(Math.Max(0, request.PageIndex), request.PageSize < 1 ? 50 : request.PageSize);
+                request = new ListVehicleCommand(Math.Max(0, request.PageIndex),
+                    request.PageSize < 1 ? 50 : request.PageSize);
 
-            var (result, totalPages) = await vehiclePort.GetVehicles((_) => true, request.PageIndex, request.PageSize);
+            var (result, totalPages) = await vehiclePort.GetVehicles(_ => true, request.PageIndex, request.PageSize);
 
 
             if (result.Count == 0)

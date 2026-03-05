@@ -21,12 +21,8 @@ public class RentVehicleCreatedMessageHandler(
     {
         var createdEvent = JsonSerializer.Deserialize<RentVehicleCreatedEvent>(body, SerializationOptions);
         if (createdEvent != null)
-        {
             await processRentCreatedUseCase.Execute(new ProcessRentCreatedCommand(createdEvent));
-        }
         else
-        {
             logger.LogWarning("Deserialization failed for {MessageType}. Body: {Body}", MessageType, body);
-        }
     }
 }

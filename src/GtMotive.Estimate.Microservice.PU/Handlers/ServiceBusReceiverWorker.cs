@@ -1,8 +1,4 @@
-using System.Text.Json;
 using Azure.Messaging.ServiceBus;
-using GtMotive.Estimate.Microservice.ApplicationCore.UseCases;
-using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.ProcessRentCreated.Commands;
-using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.ProcessRentReturned.Commands;
 using GtMotive.Estimate.Microservice.Domain.Events;
 using GtMotive.Estimate.Microservice.Infrastructure.ServiceBus;
 using Microsoft.Extensions.Options;
@@ -45,11 +41,11 @@ public class ServiceBusReceiverWorker : BackgroundService
         var body = args.Message.Body.ToString();
         _logger.LogInformation("Received message: {Body}", body);
 
-        
+
         var messageType = args.Message.Subject ??
-                         (args.Message.ApplicationProperties.TryGetValue("MessageType", out var messageTypeHeader)
-                             ? messageTypeHeader as string
-                             : null);
+                          (args.Message.ApplicationProperties.TryGetValue("MessageType", out var messageTypeHeader)
+                              ? messageTypeHeader as string
+                              : null);
 
         if (string.IsNullOrEmpty(messageType))
         {
@@ -65,17 +61,11 @@ public class ServiceBusReceiverWorker : BackgroundService
             var handler = handlers.FirstOrDefault(h => h.MessageType == messageType);
 
             if (handler != null)
-            {
                 await handler.Handle(body, args.Message, args.CancellationToken);
-            }
             else if (messageType == nameof(VehicleCreatedEvent))
-            {
                 _logger.LogInformation("VehicleCreatedEvent received, skipping as requested.");
-            }
             else
-            {
                 _logger.LogWarning("Unknown MessageType: {MessageType}", messageType);
-            }
         }
         catch (Exception ex)
         {

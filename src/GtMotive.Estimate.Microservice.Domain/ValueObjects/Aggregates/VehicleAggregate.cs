@@ -11,7 +11,7 @@ public class VehicleAggregate : EntityBase
         DateTime? inputRegistrationDate,
         string inputFrameId,
         string inputLicensePlate,
-        Vehicle? existingVehicle )
+        Vehicle? existingVehicle)
     {
         if (existingVehicle != null) throw new ArgumentException("Vehicle already exists");
         var vehicleAggregate = new VehicleAggregate

@@ -1,6 +1,7 @@
 ﻿using GtMotive.Estimate.Microservice.Domain.Common;
 using GtMotive.Estimate.Microservice.Domain.ValueObjects;
 using GtMotive.Estimate.Microservice.Infrastructure.MongoDb.Settings;
+using GtMotive.Estimate.Microservice.Infrastructure.Outbox;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -18,12 +19,10 @@ public class MongoService
         RegisterBsonClasses();
     }
 
-    public MongoClient MongoClient { get; }
+    public virtual MongoClient MongoClient { get; }
 
     private static void RegisterBsonClasses()
     {
-        // Se configura la representación de Guid globalmente para evitar errores de serialización.
-        // Se recomienda usar el formato Standard de MongoDB.
         BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
 
         if (!BsonClassMap.IsClassMapRegistered(typeof(BaseAggregate)))
@@ -41,8 +40,7 @@ public class MongoService
                 cm.MapProperty(v => v.FrameId);
                 cm.MapProperty(v => v.LicensePlate);
 
-                // Forzar el uso del constructor privado mapeando los parámetros a las propiedades/campos de BSON.
-                // Esto es necesario para clases sin constructor sin parámetros y con propiedades de solo lectura.
+
                 cm.MapCreator(v => new Vehicle(v.RegistrationDate, v.FrameId, v.LicensePlate));
             });
 
@@ -59,6 +57,13 @@ public class MongoService
 
                 cm.MapCreator(r =>
                     new RentInformation(r.Fullname, r.Email, r.TimeRentStart, r.TimeRentEnd, r.VehicleId, r.Status));
+            });
+
+        if (!BsonClassMap.IsClassMapRegistered(typeof(OutboxMessage)))
+            BsonClassMap.RegisterClassMap<OutboxMessage>(cm =>
+            {
+                cm.AutoMap();
+                cm.MapIdProperty(c => c.Id);
             });
     }
 }

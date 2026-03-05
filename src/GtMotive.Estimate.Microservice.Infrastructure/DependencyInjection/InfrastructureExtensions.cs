@@ -3,6 +3,7 @@ using GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
 using GtMotive.Estimate.Microservice.Infrastructure.Logging;
 using GtMotive.Estimate.Microservice.Infrastructure.MongoDb;
 using GtMotive.Estimate.Microservice.Infrastructure.MongoDb.Settings;
+using GtMotive.Estimate.Microservice.Infrastructure.Outbox;
 using GtMotive.Estimate.Microservice.Infrastructure.ServiceBus;
 using GtMotive.Estimate.Microservice.Infrastructure.Telemetry;
 using Microsoft.ApplicationInsights;
@@ -27,7 +28,10 @@ public static class InfrastructureExtensions
         // Service Bus
         services.AddSingleton<AzureBusFactory>();
         services.AddSingleton<IBusFactory>(sp => sp.GetRequiredService<AzureBusFactory>());
-        services.AddScoped<IBus>(sp => sp.GetRequiredService<IBusFactory>().GetClient(typeof(object)));
+        services.AddScoped<OutboxBus>();
+        services.AddScoped<IBus>(sp => sp.GetRequiredService<OutboxBus>());
+
+        services.AddHostedService<OutboxProcessor>();
 
         // Logging
         services.AddSingleton(typeof(IAppLogger<>), typeof(LoggerAdapter<>));

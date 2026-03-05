@@ -18,29 +18,27 @@ public class MongoVehicleAdapter : IVehiclePort
     }
 
 
-
     public async Task<Vehicle?> GetVehicle(Expression<Func<Vehicle, bool>> filter)
     {
         return await _collection.Find(filter).FirstOrDefaultAsync();
     }
-    
+
     public async Task<List<Vehicle>> GetVehicles(Expression<Func<Vehicle, bool>> filter)
     {
         return await _collection.Find(filter).ToListAsync();
     }
-    
-    public async  Task<(List<Vehicle>, long)> GetVehicles(Expression<Func<Vehicle, bool>> filter, int pageIndex, int pageSize)
+
+    public async Task<(List<Vehicle>, long)> GetVehicles(Expression<Func<Vehicle, bool>> filter, int pageIndex,
+        int pageSize)
     {
-        var count= await _collection.CountDocumentsAsync((_)=>true);
+        var count = await _collection.CountDocumentsAsync(_ => true);
         var vehicles = await _collection.Find(FilterDefinition<Vehicle>.Empty)
             .Skip(pageIndex * pageSize)
             .Limit(pageSize)
             .ToListAsync();
-        
-        return (vehicles, count); 
-    }
 
-    
+        return (vehicles, count);
+    }
 
 
     public async Task AddVehicle(Vehicle vehicle)

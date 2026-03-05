@@ -76,21 +76,20 @@ public class Vehicle : BaseAggregate
     public override bool Equals(object? obj)
     {
         if (obj is Vehicle vehicle)
-        {
-            return 
-                RegistrationDate == vehicle.RegistrationDate 
-                && 
-                FrameId == vehicle.FrameId 
+            return
+                RegistrationDate == vehicle.RegistrationDate
+                &&
+                FrameId == vehicle.FrameId
                 &&
                 LicensePlate == vehicle.LicensePlate;
-        }
 
         return base.Equals(obj);
     }
 
     protected bool Equals(Vehicle other)
     {
-        return RegistrationDate.Equals(other.RegistrationDate) && FrameId == other.FrameId && LicensePlate == other.LicensePlate;
+        return RegistrationDate.Equals(other.RegistrationDate) && FrameId == other.FrameId &&
+               LicensePlate == other.LicensePlate;
     }
 
     public override int GetHashCode()

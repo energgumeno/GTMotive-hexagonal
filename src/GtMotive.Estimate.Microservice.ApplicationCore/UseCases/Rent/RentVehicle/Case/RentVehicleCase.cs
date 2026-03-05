@@ -1,9 +1,7 @@
 ﻿using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.RentVehicle.Commands;
-using GtMotive.Estimate.Microservice.Domain.Enums;
 using GtMotive.Estimate.Microservice.Domain.Events;
 using GtMotive.Estimate.Microservice.Domain.Interfaces;
 using GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
-using GtMotive.Estimate.Microservice.Domain.ValueObjects;
 using GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates;
 
 namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.RentVehicle.Case;
@@ -42,7 +40,8 @@ public class RentVehicleCase(
 
             var vehicle = await vehiclePort.GetVehicle(vehicle => vehicle.Id == request.VehicleId!.Value);
             var rentVehicleByEmail =
-                await rentVehiclePort.GetVehiclesRent(information => information.Email.ToLower().Trim() == request.Email!.ToLower().Trim());
+                await rentVehiclePort.GetVehiclesRent(information =>
+                    information.Email.ToLower().Trim() == request.Email!.ToLower().Trim());
             var reservations =
                 await rentVehiclePort.GetVehiclesRent(information => information.VehicleId == request.VehicleId!.Value);
 
@@ -74,13 +73,9 @@ public class RentVehicleCase(
         catch (InvalidOperationException ex)
         {
             if (ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
-            {
                 errorOutputPort.NotFoundHandle(ex.Message);
-            }
             else
-            {
                 errorOutputPort.BadRequestHandle(ex.Message);
-            }
         }
         catch (Exception ex)
         {

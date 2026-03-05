@@ -1,7 +1,6 @@
 ﻿using FluentValidation.TestHelper;
 using GtMotive.Estimate.Microservice.Api.UseCases.Fleet.AddVehicle.Request;
 using GtMotive.Estimate.Microservice.Api.UseCases.Fleet.AddVehicle.Validator;
-using Xunit;
 
 namespace GtMotive.Estimate.Microservice.UnitTests;
 

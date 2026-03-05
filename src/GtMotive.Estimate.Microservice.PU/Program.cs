@@ -1,6 +1,5 @@
 using GtMotive.Estimate.Microservice.ApplicationCore.DependencyInjection;
 using GtMotive.Estimate.Microservice.Infrastructure.DependencyInjection;
-using GtMotive.Estimate.Microservice.PU;
 using GtMotive.Estimate.Microservice.PU.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +20,4 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 
 
-
 app.Run();
-

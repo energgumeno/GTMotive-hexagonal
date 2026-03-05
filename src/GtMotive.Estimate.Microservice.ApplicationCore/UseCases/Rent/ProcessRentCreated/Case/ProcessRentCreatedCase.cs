@@ -3,7 +3,6 @@ using GtMotive.Estimate.Microservice.Domain.Enums;
 using GtMotive.Estimate.Microservice.Domain.Interfaces;
 using GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
 using GtMotive.Estimate.Microservice.Domain.ValueObjects.Aggregates;
-using Microsoft.VisualBasic;
 
 namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.ProcessRentCreated.Case;
 
@@ -20,9 +19,9 @@ public class ProcessRentCreatedCase(IRentVehiclePort rentVehiclePort, IAppLogger
                 await rentVehiclePort.GetVehiclesRent(information =>
                     information.VehicleId == newRent.VehicleId
                     && information.Id != newRent.Id
-                    && (information.Status == RentStatus.Confirmed || information.Status == RentStatus.New) );
+                    && (information.Status == RentStatus.Confirmed || information.Status == RentStatus.New));
 
-           var newRentAggregate= VehicleRentAggregate.ConfirmRentState(newRent, conflictingRents);
+            var newRentAggregate = VehicleRentAggregate.ConfirmRentState(newRent, conflictingRents);
 
             await rentVehiclePort.UpdateVehicleRent(newRentAggregate.RentVehicleInformation!);
             await rentVehiclePort.Save();

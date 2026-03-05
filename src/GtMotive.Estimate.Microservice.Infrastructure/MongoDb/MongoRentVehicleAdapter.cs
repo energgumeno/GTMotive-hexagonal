@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using GtMotive.Estimate.Microservice.Domain.Enums;
 using GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
 using GtMotive.Estimate.Microservice.Domain.ValueObjects;
 using GtMotive.Estimate.Microservice.Infrastructure.MongoDb.Settings;
@@ -19,31 +18,26 @@ public class MongoRentVehicleAdapter : IRentVehiclePort
     }
 
 
-
-    public async   Task<RentInformation?> GetVehicleRent(Expression<Func<RentInformation, bool>> filter)
+    public async Task<RentInformation?> GetVehicleRent(Expression<Func<RentInformation, bool>> filter)
     {
-        return  await _collection.Find(filter).FirstOrDefaultAsync();
+        return await _collection.Find(filter).FirstOrDefaultAsync();
     }
 
-    public async Task<(List<RentInformation>, long)> GetVehiclesRent(int pageIndex, int pageSize)
+    public async Task<List<RentInformation>> GetVehiclesRent(Expression<Func<RentInformation, bool>> filter)
     {
-        return await GetVehiclesRent(r => true, pageIndex, pageSize);
+        return await _collection.Find(filter).ToListAsync() ?? [];
     }
 
-    public async   Task<List<RentInformation>> GetVehiclesRent(Expression<Func<RentInformation, bool>> filter)
+    public async Task<(List<RentInformation>, long)> GetVehiclesRent(Expression<Func<RentInformation, bool>> filter,
+        int pageIndex, int pageSize)
     {
-        return  (await _collection.Find(filter).ToListAsync())??[];
-    }
-    public async  Task<(List<RentInformation>, long)> GetVehiclesRent(Expression<Func<RentInformation, bool>> filter, int pageIndex, int pageSize)
-    {
-        var count= await _collection.CountDocumentsAsync<RentInformation>((_)=>true);
+        var count = await _collection.CountDocumentsAsync<RentInformation>(_ => true);
         var rents = await _collection.Find(filter)
             .Skip(pageIndex * pageSize)
             .Limit(pageSize)
             .ToListAsync();
 
-        return (rents, count); 
-        
+        return (rents, count);
     }
 
     public async Task AddVehicleRent(RentInformation rentInformation)
@@ -54,12 +48,15 @@ public class MongoRentVehicleAdapter : IRentVehiclePort
     public async Task UpdateVehicleRent(RentInformation rentInformation)
     {
         await _collection.ReplaceOneAsync(r => r.Id == rentInformation.Id, rentInformation);
-       
     }
 
     public Task<int> Save()
     {
         return Task.FromResult(1);
     }
-    
+
+    public async Task<(List<RentInformation>, long)> GetVehiclesRent(int pageIndex, int pageSize)
+    {
+        return await GetVehiclesRent(r => true, pageIndex, pageSize);
+    }
 }

@@ -51,15 +51,18 @@ public class RentInformationTests
         Assert.True(existingRent.IsConflict(newRent1));
 
         // Conflict: Same vehicle, overlapping (start inside)
-        var newRent2 = RentInformation.Create("User 2", "user2@example.com", start.AddHours(-1), start.AddHours(1), vehicleId);
+        var newRent2 = RentInformation.Create("User 2", "user2@example.com", start.AddHours(-1), start.AddHours(1),
+            vehicleId);
         Assert.True(existingRent.IsConflict(newRent2));
 
         // Conflict: Same vehicle, overlapping (end inside)
-        var newRent3 = RentInformation.Create("User 2", "user2@example.com", end.AddHours(-1), end.AddHours(1), vehicleId);
+        var newRent3 =
+            RentInformation.Create("User 2", "user2@example.com", end.AddHours(-1), end.AddHours(1), vehicleId);
         Assert.True(existingRent.IsConflict(newRent3));
 
         // Conflict: Same vehicle, new rent includes existing rent
-        var newRent4 = RentInformation.Create("User 2", "user2@example.com", start.AddHours(-1), end.AddHours(1), vehicleId);
+        var newRent4 = RentInformation.Create("User 2", "user2@example.com", start.AddHours(-1), end.AddHours(1),
+            vehicleId);
         Assert.True(existingRent.IsConflict(newRent4));
 
         // No conflict: Different vehicle
@@ -67,11 +70,13 @@ public class RentInformationTests
         Assert.False(existingRent.IsConflict(newRent5));
 
         // No conflict: Same vehicle, after existing rent
-        var newRent6 = RentInformation.Create("User 2", "user2@example.com", end.AddHours(1), end.AddHours(2), vehicleId);
+        var newRent6 =
+            RentInformation.Create("User 2", "user2@example.com", end.AddHours(1), end.AddHours(2), vehicleId);
         Assert.False(existingRent.IsConflict(newRent6));
 
         // No conflict: Same vehicle, before existing rent
-        var newRent7 = RentInformation.Create("User 2", "user2@example.com", start.AddHours(-2), start.AddHours(-1), vehicleId);
+        var newRent7 = RentInformation.Create("User 2", "user2@example.com", start.AddHours(-2), start.AddHours(-1),
+            vehicleId);
         Assert.False(existingRent.IsConflict(newRent7));
 
         // No conflict: Same rent ID

@@ -76,45 +76,31 @@ public class RentInformation : BaseAggregate
     public void Confirm()
     {
         if (Status == RentStatus.New)
-        {
             Status = RentStatus.Confirmed;
-        }
         else
-        {
             throw new InvalidOperationException(CannotCancelRentIfStatusIsNotNew);
-        }
     }
 
     public void Cancel()
     {
         if (Status == RentStatus.New)
-        {
             Status = RentStatus.Cancelled;
-        }
         else
-        {
             throw new InvalidOperationException(CannotCancelRentIfStatusIsNotNew);
-        }
     }
 
     public void ReturnVehicle()
     {
         if (Status == RentStatus.Confirmed)
-        {
             Status = RentStatus.Returned;
-        }
         else
-        {
             throw new InvalidOperationException(CannotReturnifNotAccepted);
-        }
     }
 
     public void ValidateFinishedLease()
     {
         if (Status is not (RentStatus.Cancelled or RentStatus.Returned))
-        {
             throw new InvalidOperationException($"{Email} has already a Lease.");
-        }
     }
 
     private bool IsTimeAvailable(DateTime newTimeRentStart, DateTime newTimeRentEnd)
@@ -128,9 +114,7 @@ public class RentInformation : BaseAggregate
     public void ValidateVehicleAvailability(DateTime newTimeRentStart, DateTime newTimeRentEnd)
     {
         if (!IsTimeAvailable(newTimeRentStart, newTimeRentEnd))
-        {
             throw new InvalidOperationException(VehicleNotAvailableTime);
-        }
     }
 
     public bool IsConflict(RentInformation newRent)
