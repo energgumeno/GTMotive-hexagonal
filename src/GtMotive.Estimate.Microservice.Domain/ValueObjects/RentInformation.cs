@@ -124,7 +124,7 @@ public class RentInformation : BaseAggregate
                &&
                Id != newRent.Id
                &&
-               Status == RentStatus.Confirmed
+               (Status == RentStatus.Confirmed || Status == RentStatus.New)
                &&
                IsTimeAvailable(newRent.TimeRentStart, newRent.TimeRentEnd);
     }
