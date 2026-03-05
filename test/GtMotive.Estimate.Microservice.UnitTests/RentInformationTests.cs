@@ -18,10 +18,10 @@ public class RentInformationTests
         var rentInfo = RentInformation.Create(fullname, email, start, end, vehicleId);
 
         // Act
-        rentInfo.Accept();
+        rentInfo.Confirm();
 
         // Assert
-        Assert.Equal(RentStatus.Accepted, rentInfo.Status);
+        Assert.Equal(RentStatus.Confirmed, rentInfo.Status);
     }
 
     [Fact]
@@ -30,9 +30,9 @@ public class RentInformationTests
         // Arrange
         var rentInfo = RentInformation.Create("John", "john@example.com", DateTime.Now, DateTime.Now.AddDays(1),
             Guid.NewGuid());
-        rentInfo.Accept(); // Now status is Accepted
+        rentInfo.Confirm(); // Now status is Accepted
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => rentInfo.Accept());
+        Assert.Throws<InvalidOperationException>(() => rentInfo.Confirm());
     }
 }

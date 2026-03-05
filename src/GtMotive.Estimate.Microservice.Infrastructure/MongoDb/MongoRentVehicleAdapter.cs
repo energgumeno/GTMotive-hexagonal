@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using GtMotive.Estimate.Microservice.Domain.Enums;
 using GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
 using GtMotive.Estimate.Microservice.Domain.ValueObjects;
@@ -17,35 +18,32 @@ public class MongoRentVehicleAdapter : IRentVehiclePort
         _collection = database.GetCollection<RentInformation>("VehicleRents");
     }
 
-    public async Task<(List<RentInformation?>, int)> GetVehiclesRent(int pageIndex, int pageSize)
+
+
+    public async   Task<RentInformation?> GetVehicleRent(Expression<Func<RentInformation, bool>> filter)
     {
-        var totalCount = (int)await _collection.CountDocumentsAsync(FilterDefinition<RentInformation>.Empty);
-        var rents = await _collection.Find(FilterDefinition<RentInformation>.Empty)
+        return  await _collection.Find(filter).FirstOrDefaultAsync();
+    }
+
+    public async Task<(List<RentInformation>, int)> GetVehiclesRent(int pageIndex, int pageSize)
+    {
+        return await GetVehiclesRent(r => true, pageIndex, pageSize);
+    }
+
+    public async   Task<List<RentInformation>> GetVehiclesRent(Expression<Func<RentInformation, bool>> filter)
+    {
+        return  await _collection.Find(filter).ToListAsync()??[];
+    }
+    public async  Task<(List<RentInformation>, int)> GetVehiclesRent(Expression<Func<RentInformation, bool>> filter, int pageIndex, int pageSize)
+    {
+        var totalCount = (int)await _collection.CountDocumentsAsync(filter);
+        var rents = await _collection.Find(filter)
             .Skip(pageIndex * pageSize)
             .Limit(pageSize)
             .ToListAsync();
 
-        return (rents.Cast<RentInformation?>().ToList(), totalCount);
-    }
-
-
-    public async Task<RentInformation?> GetVehicleRentByRentId(Guid rentId)
-    {
-        var result = await _collection.Find(r => r.Id == rentId).FirstOrDefaultAsync();
-        return result?.Id == rentId ? result : null;
-    }
-
-    public async Task<List<RentInformation>> GetVehiclesRentByVehicleId(Guid vehicleId)
-    {
-        return await _collection.Find(r =>
-                r.VehicleId == vehicleId && (r.Status != RentStatus.Returned || r.Status == RentStatus.Cancelled))
-            .ToListAsync();
-    }
-
-    public async Task<List<RentInformation>> GetVehicleRentByEmail(string email)
-    {
-        var result = await _collection.Find(r => r.Email == email).ToListAsync();
-        return (result?? [])!;
+        return (rents, totalCount); 
+        
     }
 
     public async Task<Guid?> AddVehicleRent(RentInformation rentInformation)

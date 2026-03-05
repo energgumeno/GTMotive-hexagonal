@@ -31,10 +31,9 @@ public class ListVehicleCase(
         ArgumentNullException.ThrowIfNull(request);
         List<Vehicle?> result;
         int TotalPages;
-        using (vehiclePort)
-        {
-            (result, TotalPages) = await vehiclePort.GetVehicles(request.PageIndex, request.PageSize);
-        }
+
+        (result, TotalPages) = await vehiclePort.GetVehicles(request.PageIndex, request.PageSize);
+
 
         if (result.Count == 0)
             outputPortNotFound.NotFoundHandle("vehicle not found");

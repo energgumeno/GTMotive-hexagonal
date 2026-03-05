@@ -6,7 +6,10 @@ namespace GtMotive.Estimate.Microservice.Domain.ValueObjects;
 
 public class RentInformation : BaseAggregate
 {
-    const string TimeRentStartBiggerTimeRentEnd = "TimeRentStart must be less than TimeRentEnd"
+    private const string TimeRentStartBiggerTimeRentEnd = "TimeRentStart must be less than TimeRentEnd";
+    private const string CannotCancelRentIfStatusIsNotNew = "Cannot cancel rent if status of current rent is not New";
+    private const string CannotReturnifNotAccepted = "Cannot return vehicle if rent is not accepted";
+    private const string VehicleNotAvailableTime = "The vehicle is not available in that Time Range.";
 
     public RentInformation(
         string fullname,
@@ -70,48 +73,59 @@ public class RentInformation : BaseAggregate
         };
     }
 
-    public void Accept()
+    public void Confirm()
     {
         if (Status != RentStatus.New)
-            throw new InvalidOperationException("Cannot accept rent if status is not New");
-        Status = RentStatus.Accepted;
+            throw new InvalidOperationException(CannotCancelRentIfStatusIsNotNew);
+        Status = RentStatus.Confirmed;
     }
 
     public void Cancel()
     {
         if (Status == RentStatus.New)
-            throw new InvalidOperationException("Cannot cancel rent if status is not New");
+            throw new InvalidOperationException(CannotReturnifNotAccepted);
         Status = RentStatus.Cancelled;
     }
 
     public void ReturnVehicle()
     {
-        if (Status != RentStatus.Accepted && Status != RentStatus.Cancelled)
-            throw new InvalidOperationException("Cannot return vehicle if rent is not accepted");
+        if (Status != RentStatus.Confirmed && Status != RentStatus.Cancelled)
+            throw new InvalidOperationException();
         Status = RentStatus.Returned;
     }
 
-    public void ValidateExistingLease(RentInformation rentVehicle)
+    public void ValidateFinishedLease()
     {
-        if (rentVehicle.Status is not (RentStatus.Cancelled or RentStatus.Returned))
+        if (Status is not (RentStatus.Cancelled or RentStatus.Returned))
         {
-            throw new InvalidOperationException($"{rentVehicle.Email} has already a Lease.");
+            throw new InvalidOperationException($"{Email} has already a Lease.");
         }
+    }
+
+    public bool IsTimeAvailable(DateTime newTimeRentStart, DateTime newTimeRentEnd)
+    {
+        bool startBetweenTimeStartAndEnd = newTimeRentStart > TimeRentStart && newTimeRentStart < TimeRentEnd;
+        bool endBetweenTimeStartAndEnd = newTimeRentEnd > TimeRentStart && newTimeRentEnd < TimeRentEnd;
+        bool timeIncludesRent = newTimeRentStart < TimeRentStart && newTimeRentEnd > TimeRentEnd;
+        return !startBetweenTimeStartAndEnd && !endBetweenTimeStartAndEnd && !timeIncludesRent;
     }
 
     public void ValidateVehicleAvailability(DateTime newTimeRentStart, DateTime newTimeRentEnd)
     {
-
-        if (newTimeRentStart <= TimeRentStart &&
-            TimeRentStart <= TimeRentEnd)
+        if (!IsTimeAvailable(newTimeRentStart, newTimeRentEnd))
         {
-            throw new InvalidOperationException($"the vehicle is not available in that {nameof(TimeRentStart)}. ");
+            throw new InvalidOperationException(VehicleNotAvailableTime);
         }
+    }
 
-        if (newTimeRentEnd <= TimeRentEnd &&
-            TimeRentStart <= TimeRentEnd)
-        {
-            throw new InvalidOperationException($"the vehicle is not available in that {nameof(TimeRentEnd)}. ");
-        }
+    public bool IsConflict(RentInformation newRent)
+    {
+        return VehicleId == newRent.VehicleId
+               &&
+               Id != newRent.Id
+               &&
+               Status == RentStatus.Confirmed
+               &&
+               IsTimeAvailable(newRent.TimeRentStart, newRent.TimeRentEnd);
     }
 }

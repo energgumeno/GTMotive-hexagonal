@@ -43,20 +43,22 @@ public class RentVehicleCase(
             new Dictionary<string, string> { { nameof(RentVehicleCase), "Start..." } });
 
         var vehicle = await vehiclePort.GetVehicle(request.VehicleId.Value);
-        var rentVehicleByEmail = await rentVehiclePort.GetVehicleRentByEmail(request.Email);
-        var reservations = await rentVehiclePort.GetVehiclesRentByVehicleId(request.VehicleId.Value);
+        var rentVehicleByEmail =
+            await rentVehiclePort.GetVehiclesRent(information => information.Email == request.Email);
+        var reservations =
+            await rentVehiclePort.GetVehiclesRent(information => information.Id == request.VehicleId.Value);
 
         var vehicleRentAggregate = VehicleRentAggregate.Create(
             request.Fullname,
             request.Email,
-            request.TimeRentStart,
-            request.TimeRentEnd,
+            request.TimeRentStart.Value,
+            request.TimeRentEnd.Value,
             vehicle,
             rentVehicleByEmail,
             reservations);
-        
+
         await rentVehiclePort.AddVehicleRent(vehicleRentAggregate.RentVehicleInformation!);
-        
+
         var bus = busFactory.GetClient(typeof(VehicleCreatedEvent));
         foreach (var vehicleRentAggregateDomainEvent in vehicleRentAggregate.DomainEvents)
             await bus.Send(vehicleRentAggregateDomainEvent);
