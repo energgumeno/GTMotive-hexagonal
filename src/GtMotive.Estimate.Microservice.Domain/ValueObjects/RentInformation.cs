@@ -43,8 +43,8 @@ public class RentInformation : BaseAggregate
     }
 
     //should be moved to user in a bounded context
-    [JsonInclude] public string Fullname { get; private set; }
-    [JsonInclude] public string Email { get; private set; }
+    [JsonInclude] public string Fullname { get; private set; } = null!;
+    [JsonInclude] public string Email { get; private set; } = null!;
 
     //should be moved to user in a bounded context
 

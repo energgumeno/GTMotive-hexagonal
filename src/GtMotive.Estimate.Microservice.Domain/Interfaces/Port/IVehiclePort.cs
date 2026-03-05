@@ -16,5 +16,5 @@ public interface IVehiclePort : IUnitOfWork
     Task<(List<Vehicle>, int)> GetVehicles(Expression<Func<Vehicle, bool>> filter, int pageIndex,
         int pageSize);
     Task<List<Vehicle>> GetVehicles(Expression<Func<Vehicle, bool>> filter);
-    Task<Guid> AddVehicle(Vehicle vehicle);
+    Task AddVehicle(Vehicle vehicle);
 }

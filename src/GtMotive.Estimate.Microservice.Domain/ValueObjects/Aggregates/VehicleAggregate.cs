@@ -10,8 +10,10 @@ public class VehicleAggregate : EntityBase
     public static VehicleAggregate Create(
         DateTime? inputRegistrationDate,
         string inputFrameId,
-        string inputLicensePlate)
+        string inputLicensePlate,
+        Vehicle? existingVehicle )
     {
+        if (existingVehicle != null) throw new ArgumentException("Vehicle already exists");
         var vehicleAggregate = new VehicleAggregate();
         vehicleAggregate.CurrentVehicle = Vehicle.Create(inputRegistrationDate, inputFrameId, inputLicensePlate);
         vehicleAggregate.AddDomainEvent(new VehicleCreatedEvent(vehicleAggregate.CurrentVehicle));

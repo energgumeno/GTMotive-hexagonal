@@ -42,10 +42,9 @@ public class MongoVehicleAdapter : IVehiclePort
     
 
 
-    public async Task<Guid> AddVehicle(Vehicle vehicle)
+    public async Task AddVehicle(Vehicle vehicle)
     {
         await _collection.InsertOneAsync(vehicle);
-        return vehicle.Id;
     }
 
     public Task<int> Save()

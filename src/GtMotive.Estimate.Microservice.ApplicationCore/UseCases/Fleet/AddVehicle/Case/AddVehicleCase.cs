@@ -34,24 +34,22 @@ public class AddVehicleCase(
 
         var bus = busFactory.GetClient(typeof(VehicleCreatedEvent));
 
-        Guid vehicleId;
-        var vehicleAggregate = VehicleAggregate.Create(
-            request.RegistrationDate,
-            request.FrameId,
-            request.LicensePlate);
-
 
         telemetry.TrackEvent(nameof(AddVehicleCase),
             new Dictionary<string, string> { { "AddVehicleCase", "Start..." } });
 
-        var vehicle = await vehiclePort.GetVehicle(vehicle=>vehicle.Equals(vehicleAggregate.CurrentVehicle!));
-        if (vehicle != null)
-        {
-            outputPortNotFound.NotFoundHandle("vehicle already exists");
-            return;
-        }
+        var existingVehicle = await vehiclePort.GetVehicle(vehicle =>
+            vehicle.RegistrationDate == request.RegistrationDate &&
+            vehicle.FrameId == request.FrameId &&
+            vehicle.LicensePlate == request.LicensePlate);
 
-        vehicleId = await vehiclePort.AddVehicle(vehicleAggregate.CurrentVehicle!)!;
+        var vehicleAggregate = VehicleAggregate.Create(
+            request.RegistrationDate,
+            request.FrameId,
+            request.LicensePlate, existingVehicle);
+
+
+        await vehiclePort.AddVehicle(vehicleAggregate.CurrentVehicle!)!;
         await vehiclePort.Save();
 
         foreach (var vehicleAggregateDomainEvent in vehicleAggregate.DomainEvents)
@@ -60,6 +58,6 @@ public class AddVehicleCase(
 
         telemetry.TrackEvent(nameof(AddVehicleCase),
             new Dictionary<string, string> { { "AddVehicleCase", "End..." } });
-        outputPortStandard.StandardHandle(new AddVehicleResponse(vehicleId));
+        outputPortStandard.StandardHandle(new AddVehicleResponse(vehicleAggregate.CurrentVehicle!.Id));
     }
 }

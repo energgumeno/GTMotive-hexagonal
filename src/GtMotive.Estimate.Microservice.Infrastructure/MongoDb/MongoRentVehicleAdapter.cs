@@ -46,25 +46,20 @@ public class MongoRentVehicleAdapter : IRentVehiclePort
         
     }
 
-    public async Task<Guid?> AddVehicleRent(RentInformation rentInformation)
+    public async Task AddVehicleRent(RentInformation rentInformation)
     {
         await _collection.InsertOneAsync(rentInformation);
-        return rentInformation.Id;
     }
 
-    public async Task<Guid?> UpdateVehicleRent(RentInformation rentInformation)
+    public async Task UpdateVehicleRent(RentInformation rentInformation)
     {
-        var result = await _collection.ReplaceOneAsync(r => r.Id == rentInformation.Id, rentInformation);
-        return result.ModifiedCount > 0 ? rentInformation.Id : null;
+        await _collection.ReplaceOneAsync(r => r.Id == rentInformation.Id, rentInformation);
+       
     }
 
     public Task<int> Save()
     {
         return Task.FromResult(1);
     }
-
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-    }
+    
 }

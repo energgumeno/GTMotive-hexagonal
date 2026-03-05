@@ -12,6 +12,6 @@ public interface IRentVehiclePort : IUnitOfWork
 
     Task<List<RentInformation>> GetVehiclesRent(Expression<Func<RentInformation, bool>> filter);
 
-    Task<Guid?> AddVehicleRent(RentInformation rentInformation);
-    Task<Guid?> UpdateVehicleRent(RentInformation rentInformation);
+    Task AddVehicleRent(RentInformation rentInformation);
+    Task UpdateVehicleRent(RentInformation rentInformation);
 }
