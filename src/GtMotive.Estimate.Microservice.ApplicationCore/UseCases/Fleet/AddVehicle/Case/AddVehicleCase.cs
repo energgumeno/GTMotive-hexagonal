@@ -24,40 +24,48 @@ public class AddVehicleCase(
     /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
     public async Task Execute(AddVehicleCommand request)
     {
-        ArgumentNullException.ThrowIfNull(request);
+        try
+        {
+            ArgumentNullException.ThrowIfNull(request);
 
-        if (request.RegistrationDate == null) throw new ArgumentException("Registration date is required");
+            if (request.RegistrationDate == null) throw new ArgumentException("Registration date is required");
 
-        if (request.FrameId == null) throw new ArgumentException("Frame id is required");
+            if (request.FrameId == null) throw new ArgumentException("Frame id is required");
 
-        if (request.LicensePlate == null) throw new ArgumentException("License Plate id is required");
-
-        var bus = busFactory.GetClient(typeof(VehicleCreatedEvent));
-
-
-        telemetry.TrackEvent(nameof(AddVehicleCase),
-            new Dictionary<string, string> { { "AddVehicleCase", "Start..." } });
-
-        var existingVehicle = await vehiclePort.GetVehicle(vehicle =>
-            vehicle.RegistrationDate == request.RegistrationDate &&
-            vehicle.FrameId == request.FrameId &&
-            vehicle.LicensePlate == request.LicensePlate);
-
-        var vehicleAggregate = VehicleAggregate.Create(
-            request.RegistrationDate,
-            request.FrameId,
-            request.LicensePlate, existingVehicle);
+            if (request.LicensePlate == null) throw new ArgumentException("License Plate id is required");
 
 
-        await vehiclePort.AddVehicle(vehicleAggregate.CurrentVehicle!)!;
-        await vehiclePort.Save();
-
-        foreach (var vehicleAggregateDomainEvent in vehicleAggregate.DomainEvents)
-            await bus.Send(vehicleAggregateDomainEvent);
+            var bus = busFactory.GetClient(typeof(VehicleCreatedEvent));
 
 
-        telemetry.TrackEvent(nameof(AddVehicleCase),
-            new Dictionary<string, string> { { "AddVehicleCase", "End..." } });
-        outputPortStandard.StandardHandle(new AddVehicleResponse(vehicleAggregate.CurrentVehicle!.Id));
+            telemetry.TrackEvent(nameof(AddVehicleCase),
+                new Dictionary<string, string> { { "AddVehicleCase", "Start..." } });
+
+            var existingVehicle = await vehiclePort.GetVehicle(vehicle =>
+                vehicle.RegistrationDate == request.RegistrationDate &&
+                vehicle.FrameId == request.FrameId &&
+                vehicle.LicensePlate == request.LicensePlate);
+
+            var vehicleAggregate = VehicleAggregate.Create(
+                request.RegistrationDate,
+                request.FrameId,
+                request.LicensePlate, existingVehicle);
+
+
+            await vehiclePort.AddVehicle(vehicleAggregate.CurrentVehicle!)!;
+            await vehiclePort.Save();
+
+            foreach (var vehicleAggregateDomainEvent in vehicleAggregate.DomainEvents)
+                await bus.Send(vehicleAggregateDomainEvent);
+
+
+            telemetry.TrackEvent(nameof(AddVehicleCase),
+                new Dictionary<string, string> { { "AddVehicleCase", "End..." } });
+            outputPortStandard.StandardHandle(new AddVehicleResponse(vehicleAggregate.CurrentVehicle!.Id));
+        }
+        catch (Exception ex)
+        {
+            outputPortNotFound.NotFoundHandle(ex.Message);
+        }
     }
 }

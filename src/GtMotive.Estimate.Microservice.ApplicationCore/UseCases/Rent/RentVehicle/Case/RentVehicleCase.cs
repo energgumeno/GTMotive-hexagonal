@@ -33,41 +33,48 @@ public class RentVehicleCase(
     /// <returns>A task representing the asynchronous operation.</returns>
     public async Task Execute(RentVehicleCommand request)
     {
-        ArgumentNullException.ThrowIfNull(request);
-        ArgumentException.ThrowIfNullOrWhiteSpace(request.Fullname);
-        ArgumentException.ThrowIfNullOrWhiteSpace(request.Email);
-        if (!request.TimeRentStart.HasValue) throw new ArgumentNullException(nameof(request.TimeRentStart));
-        if (!request.TimeRentEnd.HasValue) throw new ArgumentNullException(nameof(request.TimeRentEnd));
-        if (!request.VehicleId.HasValue) throw new ArgumentNullException(nameof(request.VehicleId));
+        try
+        {
+            ArgumentNullException.ThrowIfNull(request);
+            ArgumentException.ThrowIfNullOrWhiteSpace(request.Fullname);
+            ArgumentException.ThrowIfNullOrWhiteSpace(request.Email);
+            if (!request.TimeRentStart.HasValue) throw new ArgumentNullException(nameof(request.TimeRentStart));
+            if (!request.TimeRentEnd.HasValue) throw new ArgumentNullException(nameof(request.TimeRentEnd));
+            if (!request.VehicleId.HasValue) throw new ArgumentNullException(nameof(request.VehicleId));
 
-        telemetry.TrackEvent(nameof(RentVehicleCase),
-            new Dictionary<string, string> { { nameof(RentVehicleCase), "Start..." } });
+            telemetry.TrackEvent(nameof(RentVehicleCase),
+                new Dictionary<string, string> { { nameof(RentVehicleCase), "Start..." } });
 
-        var vehicle = await vehiclePort.GetVehicle(vehicle=>vehicle.Id == request.VehicleId.Value);
-        var rentVehicleByEmail =
-            await rentVehiclePort.GetVehiclesRent(information => information.Email == request.Email);
-        var reservations =
-            await rentVehiclePort.GetVehiclesRent(information => information.Id == request.VehicleId.Value);
+            var vehicle = await vehiclePort.GetVehicle(vehicle => vehicle.Id == request.VehicleId.Value);
+            var rentVehicleByEmail =
+                await rentVehiclePort.GetVehiclesRent(information => information.Email == request.Email);
+            var reservations =
+                await rentVehiclePort.GetVehiclesRent(information => information.Id == request.VehicleId.Value);
 
-        var vehicleRentAggregate = VehicleRentAggregate.Create(
-            request.Fullname,
-            request.Email,
-            request.TimeRentStart.Value,
-            request.TimeRentEnd.Value,
-            vehicle,
-            rentVehicleByEmail,
-            reservations);
+            var vehicleRentAggregate = VehicleRentAggregate.Create(
+                request.Fullname,
+                request.Email,
+                request.TimeRentStart.Value,
+                request.TimeRentEnd.Value,
+                vehicle,
+                rentVehicleByEmail,
+                reservations);
 
-        await rentVehiclePort.AddVehicleRent(vehicleRentAggregate.RentVehicleInformation!);
+            await rentVehiclePort.AddVehicleRent(vehicleRentAggregate.RentVehicleInformation!);
 
-        var bus = busFactory.GetClient(typeof(VehicleCreatedEvent));
-        foreach (var vehicleRentAggregateDomainEvent in vehicleRentAggregate.DomainEvents)
-            await bus.Send(vehicleRentAggregateDomainEvent);
+            var bus = busFactory.GetClient(typeof(RentVehicleCreatedEvent));
+            foreach (var vehicleRentAggregateDomainEvent in vehicleRentAggregate.DomainEvents)
+                await bus.Send(vehicleRentAggregateDomainEvent);
 
-        telemetry.TrackEvent(nameof(RentVehicleCase),
-            new Dictionary<string, string> { { nameof(RentVehicleCase), "End..." } });
+            telemetry.TrackEvent(nameof(RentVehicleCase),
+                new Dictionary<string, string> { { nameof(RentVehicleCase), "End..." } });
 
 
-        outputPortStandard.StandardHandle(new RentVehicleResponse(vehicleRentAggregate.RentVehicleInformation!.Id));
+            outputPortStandard.StandardHandle(new RentVehicleResponse(vehicleRentAggregate.RentVehicleInformation!.Id));
+        }
+        catch (Exception ex)
+        {
+            outputPortNotFound.NotFoundHandle(ex.Message);
+        }
     }
 }

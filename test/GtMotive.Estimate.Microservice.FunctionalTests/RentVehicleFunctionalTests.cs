@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using GtMotive.Estimate.Microservice.ApplicationCore.UseCases;
 using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.RentVehicle.Case;
 using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.RentVehicle.Commands;
@@ -45,16 +46,14 @@ public class RentVehicleFunctionalTests
     public async Task Execute_WhenVehicleExistsAndNoPreviousRent_ShouldSucceed_AndApplyDomainLogic()
     {
         // Arrange
-        var vehicleId = Guid.NewGuid();
-        // Usamos lógica de dominio real para crear el vehículo
         var vehicle = Vehicle.Create(DateTime.Now.AddYears(-1), "FRAME123", "ABC-123");
+        var vehicleId = vehicle.Id;
         var command = new RentVehicleCommand("John Doe", "john@example.com", DateTime.Now.AddDays(1),
             DateTime.Now.AddDays(2), vehicleId);
 
-        _vehiclePortMock.Setup(v => v.GetVehicle(veh => veh.Id == vehicleId)).ReturnsAsync(vehicle);
-        _rentVehiclePortMock.Setup(r => r.GetVehicleRent(information => information.Email == command.Email!))
-            .ReturnsAsync((RentInformation?)null);
-        _rentVehiclePortMock.Setup(r => r.GetVehiclesRent((information) => information.Id == vehicleId))
+        _vehiclePortMock.Setup(v => v.GetVehicle(It.IsAny<Expression<Func<Vehicle, bool>>>()))
+            .ReturnsAsync(vehicle);
+        _rentVehiclePortMock.Setup(r => r.GetVehiclesRent(It.IsAny<Expression<Func<RentInformation, bool>>>()))
             .ReturnsAsync(new List<RentInformation>());
 
         // Act

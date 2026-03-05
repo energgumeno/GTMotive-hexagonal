@@ -26,17 +26,25 @@ public class ListVehicleCase(
     /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
     public async Task Execute(ListVehicleCommand? request)
     {
-        if (request == null || request.PageIndex < 0 || request.PageSize < 1) request = new ListVehicleCommand(0, 50);
+        try
+        {
+            if (request == null || request.PageIndex < 0 || request.PageSize < 1)
+                request = new ListVehicleCommand(0, 50);
 
-        ArgumentNullException.ThrowIfNull(request);
-        
-        var (result, totalPages) = await vehiclePort.GetVehicles((_)=>true, request.PageIndex, request.PageSize);
+            ArgumentNullException.ThrowIfNull(request);
+
+            var (result, totalPages) = await vehiclePort.GetVehicles((_) => true, request.PageIndex, request.PageSize);
 
 
-        if (result.Count == 0)
-            outputPortNotFound.NotFoundHandle("vehicle not found");
-        else
-            outputPortStandard.StandardHandle(new ListVehicleResponse(result, totalPages, request.PageIndex,
-                request.PageSize));
+            if (result.Count == 0)
+                outputPortNotFound.NotFoundHandle("vehicle not found");
+            else
+                outputPortStandard.StandardHandle(new ListVehicleResponse(result, totalPages, request.PageIndex,
+                    request.PageSize));
+        }
+        catch (Exception ex)
+        {
+            outputPortNotFound.NotFoundHandle(ex.Message);
+        }
     }
 }
