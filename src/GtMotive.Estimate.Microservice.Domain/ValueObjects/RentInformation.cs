@@ -24,12 +24,12 @@ public class RentInformation : BaseAggregate
         if (!timeRentStart.HasValue) throw new ArgumentNullException(nameof(timeRentStart));
         if (!timeRentEnd.HasValue) throw new ArgumentNullException(nameof(timeRentEnd));
         if (!vehicleId.HasValue) throw new ArgumentNullException(nameof(vehicleId));
-        if (timeRentStart >= timeRentEnd) throw new ArgumentException(TimeRentStartBiggerTimeRentEnd);
+        if (timeRentStart.Value >= timeRentEnd.Value) throw new ArgumentException(TimeRentStartBiggerTimeRentEnd);
 
         Fullname = fullname;
         Email = email;
-        TimeRentStart = timeRentStart ?? DateTime.Now;
-        TimeRentEnd = timeRentEnd ?? DateTime.Now;
+        TimeRentStart = timeRentStart.Value;
+        TimeRentEnd = timeRentEnd.Value;
         VehicleId = vehicleId ?? Guid.Empty;
         Status = status;
     }
@@ -102,12 +102,12 @@ public class RentInformation : BaseAggregate
         }
     }
 
-    public bool IsTimeAvailable(DateTime newTimeRentStart, DateTime newTimeRentEnd)
+    private bool IsTimeAvailable(DateTime newTimeRentStart, DateTime newTimeRentEnd)
     {
-        bool startBetweenTimeStartAndEnd = newTimeRentStart >= TimeRentStart && newTimeRentStart < TimeRentEnd;
-        bool endBetweenTimeStartAndEnd = newTimeRentEnd > TimeRentStart && newTimeRentEnd <= TimeRentEnd;
-        bool timeIncludesRent = newTimeRentStart <= TimeRentStart && newTimeRentEnd >= TimeRentEnd;
-        return !startBetweenTimeStartAndEnd && !endBetweenTimeStartAndEnd && !timeIncludesRent;
+        var startBetweenTimeStartAndEnd = TimeRentStart <= newTimeRentStart && newTimeRentStart <= TimeRentEnd;
+        var endBetweenTimeStartAndEnd = TimeRentStart <= newTimeRentEnd && newTimeRentEnd <= TimeRentEnd;
+        var timeIncludesRent = newTimeRentStart <= TimeRentStart && TimeRentEnd <= newTimeRentEnd;
+        return !(startBetweenTimeStartAndEnd || endBetweenTimeStartAndEnd || timeIncludesRent);
     }
 
     public void ValidateVehicleAvailability(DateTime newTimeRentStart, DateTime newTimeRentEnd)
@@ -131,7 +131,9 @@ public class RentInformation : BaseAggregate
 
     protected bool Equals(RentInformation other)
     {
-        return Fullname == other.Fullname && Email == other.Email && VehicleId.Equals(other.VehicleId) && Status == other.Status && TimeRentStart.Equals(other.TimeRentStart) && TimeRentEnd.Equals(other.TimeRentEnd);
+        return Fullname == other.Fullname && Email == other.Email && VehicleId.Equals(other.VehicleId) &&
+               Status == other.Status && TimeRentStart.Equals(other.TimeRentStart) &&
+               TimeRentEnd.Equals(other.TimeRentEnd);
     }
 
     public override bool Equals(object? obj)
