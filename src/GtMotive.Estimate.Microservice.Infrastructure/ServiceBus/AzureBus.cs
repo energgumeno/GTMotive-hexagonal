@@ -18,7 +18,8 @@ public class AzureBus : IBus
         var messageBody = JsonSerializer.Serialize(message);
         var serviceBusMessage = new ServiceBusMessage(messageBody)
         {
-            ContentType = "application/json"
+            ContentType = "application/json",
+            Subject = message.GetType().Name
         };
         serviceBusMessage.ApplicationProperties.Add("MessageType", message.GetType().Name);
         await _sender.SendMessageAsync(serviceBusMessage);

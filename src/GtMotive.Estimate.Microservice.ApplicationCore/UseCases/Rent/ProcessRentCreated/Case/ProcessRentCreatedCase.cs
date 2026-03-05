@@ -22,9 +22,9 @@ public class ProcessRentCreatedCase(IRentVehiclePort rentVehiclePort, IAppLogger
                     && information.Id != newRent.Id
                     && (information.Status == RentStatus.Confirmed || information.Status == RentStatus.New) );
 
-            VehicleRentAggregate.ConfirmRentState(newRent, conflictingRents);
+           var newRentAggregate= VehicleRentAggregate.ConfirmRentState(newRent, conflictingRents);
 
-            await rentVehiclePort.UpdateVehicleRent(newRent);
+            await rentVehiclePort.UpdateVehicleRent(newRentAggregate.RentVehicleInformation!);
             await rentVehiclePort.Save();
         }
         catch (Exception ex)

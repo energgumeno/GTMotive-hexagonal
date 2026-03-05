@@ -11,11 +11,6 @@ namespace GtMotive.Estimate.Microservice.PU.Handlers;
 
 public class ServiceBusReceiverWorker : BackgroundService
 {
-    private static readonly JsonSerializerOptions SerializationOptions = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
-
     private readonly ServiceBusClient _client;
     private readonly ILogger<ServiceBusReceiverWorker> _logger;
     private readonly ServiceBusProcessor _processor;
@@ -50,10 +45,15 @@ public class ServiceBusReceiverWorker : BackgroundService
         var body = args.Message.Body.ToString();
         _logger.LogInformation("Received message: {Body}", body);
 
-        if (!args.Message.ApplicationProperties.TryGetValue("MessageType", out var messageTypeHeader) ||
-            messageTypeHeader is not string messageType)
+        
+        var messageType = args.Message.Subject ??
+                         (args.Message.ApplicationProperties.TryGetValue("MessageType", out var messageTypeHeader)
+                             ? messageTypeHeader as string
+                             : null);
+
+        if (string.IsNullOrEmpty(messageType))
         {
-            _logger.LogWarning("Message received without MessageType header. Body: {Body}", body);
+            _logger.LogWarning("Message received without Subject or MessageType header. Body: {Body}", body);
             await args.CompleteMessageAsync(args.Message);
             return;
         }
@@ -61,45 +61,20 @@ public class ServiceBusReceiverWorker : BackgroundService
         try
         {
             using var scope = _serviceProvider.CreateScope();
+            var handlers = scope.ServiceProvider.GetServices<IMessageHandler>();
+            var handler = handlers.FirstOrDefault(h => h.MessageType == messageType);
 
-            switch (messageType)
+            if (handler != null)
             {
-                case nameof(RentVehicleReturnedEvent):
-                    var returnedEvent =
-                        JsonSerializer.Deserialize<RentVehicleReturnedEvent>(body, SerializationOptions);
-                    if (returnedEvent != null)
-                    {
-                        var useCase = scope.ServiceProvider.GetRequiredService<IUseCase<ProcessRentReturnedCommand>>();
-                        await useCase.Execute(new ProcessRentReturnedCommand(returnedEvent));
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Deserialization failed for {MessageType}. Body: {Body}", messageType, body);
-                    }
-
-                    break;
-
-                case nameof(RentVehicleCreatedEvent):
-                    var createdEvent = JsonSerializer.Deserialize<RentVehicleCreatedEvent>(body, SerializationOptions);
-                    if (createdEvent != null)
-                    {
-                        var useCase = scope.ServiceProvider.GetRequiredService<IUseCase<ProcessRentCreatedCommand>>();
-                        await useCase.Execute(new ProcessRentCreatedCommand(createdEvent));
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Deserialization failed for {MessageType}. Body: {Body}", messageType, body);
-                    }
-
-                    break;
-
-                case nameof(VehicleCreatedEvent):
-                    _logger.LogInformation("VehicleCreatedEvent received, skipping as requested.");
-                    break;
-
-                default:
-                    _logger.LogWarning("Unknown MessageType: {MessageType}", messageType);
-                    break;
+                await handler.Handle(body, args.Message, args.CancellationToken);
+            }
+            else if (messageType == nameof(VehicleCreatedEvent))
+            {
+                _logger.LogInformation("VehicleCreatedEvent received, skipping as requested.");
+            }
+            else
+            {
+                _logger.LogWarning("Unknown MessageType: {MessageType}", messageType);
             }
         }
         catch (Exception ex)

@@ -13,7 +13,7 @@ public class ProcessRentReturnedCase(IRentVehiclePort rentVehiclePort, IAppLogge
         {
             var rent = request.Event.RentInformation;
 
-            //delete the rent, move it, send invoice etc.
+            //delete the rent, move it to another table, send invoice etc.
             
             await rentVehiclePort.Save();
         }
