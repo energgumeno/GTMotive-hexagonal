@@ -17,7 +17,10 @@ public class ProcessRentCreatedCase(IRentVehiclePort rentVehiclePort, IAppLogger
             var newRent = request.Event.RentInformation;
 
             var conflictingRents =
-                await rentVehiclePort.GetVehiclesRent(information => information.IsConflict(newRent));
+                await rentVehiclePort.GetVehiclesRent(information =>
+                    information.VehicleId == newRent.VehicleId
+                    && information.Id != newRent.Id
+                    && (information.Status == RentStatus.Confirmed || information.Status == RentStatus.New) );
 
             VehicleRentAggregate.ConfirmRentState(newRent, conflictingRents);
 

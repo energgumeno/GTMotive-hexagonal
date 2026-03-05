@@ -38,16 +38,17 @@ public class VehicleRentAggregate : EntityBase
             activeRent.ValidateVehicleAvailability(timeRentStart, timeRentEnd);
         }
 
-
         vehicleRentAggregate.AddDomainEvent(
             new RentVehicleCreatedEvent(vehicleRentAggregate.RentVehicleInformation));
         return vehicleRentAggregate;
     }
-    
-    public static VehicleRentAggregate ConfirmRentState(RentInformation rentInformation, List<RentInformation> conflicts)
+
+    public static VehicleRentAggregate ConfirmRentState(RentInformation rentInformation,
+        List<RentInformation> conflicts)
     {
         var aggregate = new VehicleRentAggregate { RentVehicleInformation = rentInformation };
-        if (conflicts.Any())
+        conflicts = conflicts.Where(conflict => conflict.IsConflict(rentInformation)).ToList();
+        if (conflicts.Count != 0)
             aggregate.RentVehicleInformation.Cancel();
         else
             aggregate.RentVehicleInformation.Confirm();

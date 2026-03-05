@@ -13,9 +13,8 @@ public class ProcessRentReturnedCase(IRentVehiclePort rentVehiclePort, IAppLogge
         {
             var rent = request.Event.RentInformation;
 
-            VehicleRentAggregate.ReturnVehicle(rent);
-
-            await rentVehiclePort.UpdateVehicleRent(rent);
+            //delete the rent, move it, send invoice etc.
+            
             await rentVehiclePort.Save();
         }
         catch (Exception ex)

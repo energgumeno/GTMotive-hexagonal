@@ -75,23 +75,38 @@ public class RentInformation : BaseAggregate
 
     public void Confirm()
     {
-        if (Status != RentStatus.New)
+        if (Status == RentStatus.New)
+        {
+            Status = RentStatus.Confirmed;
+        }
+        else
+        {
             throw new InvalidOperationException(CannotCancelRentIfStatusIsNotNew);
-        Status = RentStatus.Confirmed;
+        }
     }
 
     public void Cancel()
     {
         if (Status == RentStatus.New)
-            throw new InvalidOperationException(CannotReturnifNotAccepted);
-        Status = RentStatus.Cancelled;
+        {
+            Status = RentStatus.Cancelled;
+        }
+        else
+        {
+            throw new InvalidOperationException(CannotCancelRentIfStatusIsNotNew);
+        }
     }
 
     public void ReturnVehicle()
     {
-        if (Status != RentStatus.Confirmed && Status != RentStatus.Cancelled)
-            throw new InvalidOperationException();
-        Status = RentStatus.Returned;
+        if (Status == RentStatus.Confirmed)
+        {
+            Status = RentStatus.Returned;
+        }
+        else
+        {
+            throw new InvalidOperationException(CannotReturnifNotAccepted);
+        }
     }
 
     public void ValidateFinishedLease()
@@ -126,7 +141,7 @@ public class RentInformation : BaseAggregate
                &&
                (Status == RentStatus.Confirmed || Status == RentStatus.New)
                &&
-               IsTimeAvailable(newRent.TimeRentStart, newRent.TimeRentEnd);
+               !IsTimeAvailable(newRent.TimeRentStart, newRent.TimeRentEnd);
     }
 
     protected bool Equals(RentInformation other)
