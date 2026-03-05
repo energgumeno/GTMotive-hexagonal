@@ -29,14 +29,15 @@ public class MongoVehicleAdapter : IVehiclePort
         return await _collection.Find(filter).ToListAsync();
     }
     
-    public async  Task<(List<Vehicle>, int)> GetVehicles(Expression<Func<Vehicle, bool>> filter, int pageIndex, int pageSize)
+    public async  Task<(List<Vehicle>, long)> GetVehicles(Expression<Func<Vehicle, bool>> filter, int pageIndex, int pageSize)
     {
+        var count= await _collection.CountDocumentsAsync((_)=>true);
         var vehicles = await _collection.Find(FilterDefinition<Vehicle>.Empty)
             .Skip(pageIndex * pageSize)
             .Limit(pageSize)
             .ToListAsync();
         
-        return (vehicles, vehicles.Count); 
+        return (vehicles, count); 
     }
 
     

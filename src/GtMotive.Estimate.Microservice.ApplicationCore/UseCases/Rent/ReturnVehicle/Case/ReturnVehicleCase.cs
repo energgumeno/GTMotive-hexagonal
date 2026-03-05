@@ -32,9 +32,6 @@ public class ReturnVehicleCase(
     {
         try
         {
-            ArgumentNullException.ThrowIfNull(request);
-            if (!request.RentId.HasValue) throw new ArgumentNullException(nameof(request.RentId));
-
             var bus = busFactory.GetClient(typeof(ReturnVehicleCase));
 
 
@@ -42,10 +39,10 @@ public class ReturnVehicleCase(
                 new Dictionary<string, string> { { nameof(ReturnVehicleCommand), "Start..." } });
 
             var vehicleRent =
-                await rentVehiclePort.GetVehicleRent(information => information.Id == request.RentId.Value);
+                await rentVehiclePort.GetVehicleRent(information => information.Id == request.RentId!.Value);
             if (vehicleRent == null)
             {
-                errorOutputPort.NotFoundHandle($"Vehicle rent with id {request.RentId.Value} not found");
+                errorOutputPort.NotFoundHandle($"Vehicle rent with id {request.RentId!.Value} not found");
                 return;
             }
 
@@ -60,7 +57,7 @@ public class ReturnVehicleCase(
                 new Dictionary<string, string> { { nameof(ReturnVehicleCommand), "End..." } });
 
 
-            outputPortStandard.StandardHandle(new ReturnVehicleResponse(request.RentId.Value));
+            outputPortStandard.StandardHandle(new ReturnVehicleResponse(request.RentId!.Value));
         }
         catch (ArgumentException ex)
         {

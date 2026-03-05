@@ -24,7 +24,7 @@ public class RentInformation : BaseAggregate
         if (!timeRentStart.HasValue) throw new ArgumentNullException(nameof(timeRentStart));
         if (!timeRentEnd.HasValue) throw new ArgumentNullException(nameof(timeRentEnd));
         if (!vehicleId.HasValue) throw new ArgumentNullException(nameof(vehicleId));
-        if (timeRentStart > timeRentEnd) throw new ArgumentException(TimeRentStartBiggerTimeRentEnd);
+        if (timeRentStart >= timeRentEnd) throw new ArgumentException(TimeRentStartBiggerTimeRentEnd);
 
         Fullname = fullname;
         Email = email;
@@ -104,9 +104,9 @@ public class RentInformation : BaseAggregate
 
     public bool IsTimeAvailable(DateTime newTimeRentStart, DateTime newTimeRentEnd)
     {
-        bool startBetweenTimeStartAndEnd = newTimeRentStart > TimeRentStart && newTimeRentStart < TimeRentEnd;
-        bool endBetweenTimeStartAndEnd = newTimeRentEnd > TimeRentStart && newTimeRentEnd < TimeRentEnd;
-        bool timeIncludesRent = newTimeRentStart < TimeRentStart && newTimeRentEnd > TimeRentEnd;
+        bool startBetweenTimeStartAndEnd = newTimeRentStart >= TimeRentStart && newTimeRentStart < TimeRentEnd;
+        bool endBetweenTimeStartAndEnd = newTimeRentEnd > TimeRentStart && newTimeRentEnd <= TimeRentEnd;
+        bool timeIncludesRent = newTimeRentStart <= TimeRentStart && newTimeRentEnd >= TimeRentEnd;
         return !startBetweenTimeStartAndEnd && !endBetweenTimeStartAndEnd && !timeIncludesRent;
     }
 

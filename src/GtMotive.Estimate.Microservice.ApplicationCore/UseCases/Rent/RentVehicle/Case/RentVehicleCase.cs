@@ -37,27 +37,20 @@ public class RentVehicleCase(
     {
         try
         {
-            ArgumentNullException.ThrowIfNull(request);
-            ArgumentException.ThrowIfNullOrWhiteSpace(request.Fullname);
-            ArgumentException.ThrowIfNullOrWhiteSpace(request.Email);
-            if (!request.TimeRentStart.HasValue) throw new ArgumentNullException(nameof(request.TimeRentStart));
-            if (!request.TimeRentEnd.HasValue) throw new ArgumentNullException(nameof(request.TimeRentEnd));
-            if (!request.VehicleId.HasValue) throw new ArgumentNullException(nameof(request.VehicleId));
-
             telemetry.TrackEvent(nameof(RentVehicleCase),
                 new Dictionary<string, string> { { nameof(RentVehicleCase), "Start..." } });
 
-            var vehicle = await vehiclePort.GetVehicle(vehicle => vehicle.Id == request.VehicleId.Value);
+            var vehicle = await vehiclePort.GetVehicle(vehicle => vehicle.Id == request.VehicleId!.Value);
             var rentVehicleByEmail =
-                await rentVehiclePort.GetVehiclesRent(information => information.Email == request.Email);
+                await rentVehiclePort.GetVehiclesRent(information => information.Email.ToLower().Trim() == request.Email!.ToLower().Trim());
             var reservations =
-                await rentVehiclePort.GetVehiclesRent(information => information.Id == request.VehicleId.Value);
+                await rentVehiclePort.GetVehiclesRent(information => information.VehicleId == request.VehicleId!.Value);
 
             var vehicleRentAggregate = VehicleRentAggregate.Create(
-                request.Fullname,
-                request.Email,
-                request.TimeRentStart.Value,
-                request.TimeRentEnd.Value,
+                request.Fullname!,
+                request.Email!,
+                request.TimeRentStart!.Value,
+                request.TimeRentEnd!.Value,
                 vehicle,
                 rentVehicleByEmail,
                 reservations);

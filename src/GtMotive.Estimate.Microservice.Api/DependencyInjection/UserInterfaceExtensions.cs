@@ -1,8 +1,11 @@
-﻿using GtMotive.Estimate.Microservice.Api.UseCases;
+﻿using FluentValidation;
+using GtMotive.Estimate.Microservice.Api.UseCases;
 using GtMotive.Estimate.Microservice.Api.UseCases.Common.BaseHandler;
+using GtMotive.Estimate.Microservice.Api.UseCases.Common.Validation;
 using GtMotive.Estimate.Microservice.ApplicationCore.DependencyInjection;
 using GtMotive.Estimate.Microservice.ApplicationCore.UseCases;
 using GtMotive.Estimate.Microservice.Infrastructure.DependencyInjection;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +21,10 @@ public static class UserInterfaceExtensions
 
         // web api
         services.AddScoped<IWebApiPresenter, WebApiPresenter>();
+
+        // Validation
+        services.AddValidatorsFromAssembly(typeof(UserInterfaceExtensions).Assembly);
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
         // output ports
         services.AddScoped<IErrorOutputPort, ErrorOutputPort>();

@@ -18,7 +18,7 @@ public class VehicleRentAggregate : EntityBase
     {
         if (vehicle == null)
         {
-            throw new ArgumentException($"Vehicle with not found");
+            throw new ArgumentException($"Vehicle not found");
         }
 
         var vehicleRentAggregate = new VehicleRentAggregate();

@@ -26,14 +26,12 @@ public class ListVehicleCase(
     /// </summary>
     /// <param name="request">the page configuration.</param>
     /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-    public async Task Execute(ListVehicleCommand? request)
+    public async Task Execute(ListVehicleCommand request)
     {
         try
         {
-            if (request == null || request.PageIndex < 0 || request.PageSize < 1)
-                request = new ListVehicleCommand(0, 50);
-
-            ArgumentNullException.ThrowIfNull(request);
+            if (request.PageIndex < 0 || request.PageSize < 1)
+                request = new ListVehicleCommand(Math.Max(0, request.PageIndex), request.PageSize < 1 ? 50 : request.PageSize);
 
             var (result, totalPages) = await vehiclePort.GetVehicles((_) => true, request.PageIndex, request.PageSize);
 

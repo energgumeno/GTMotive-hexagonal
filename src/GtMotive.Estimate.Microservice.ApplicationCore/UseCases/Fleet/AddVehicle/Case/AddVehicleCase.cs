@@ -33,15 +33,6 @@ public class AddVehicleCase(
     {
         try
         {
-            ArgumentNullException.ThrowIfNull(request);
-
-            if (request.RegistrationDate == null) throw new ArgumentException("Registration date is required");
-
-            if (request.FrameId == null) throw new ArgumentException("Frame id is required");
-
-            if (request.LicensePlate == null) throw new ArgumentException("License Plate id is required");
-
-
             var bus = busFactory.GetClient(typeof(VehicleCreatedEvent));
 
 
@@ -49,14 +40,13 @@ public class AddVehicleCase(
                 new Dictionary<string, string> { { "AddVehicleCase", "Start..." } });
 
             var existingVehicle = await vehiclePort.GetVehicle(vehicle =>
-                vehicle.RegistrationDate == request.RegistrationDate &&
-                vehicle.FrameId == request.FrameId &&
-                vehicle.LicensePlate == request.LicensePlate);
+                vehicle.FrameId == request.FrameId 
+                );
 
             var vehicleAggregate = VehicleAggregate.Create(
                 request.RegistrationDate,
-                request.FrameId,
-                request.LicensePlate, existingVehicle);
+                request.FrameId!,
+                request.LicensePlate!, existingVehicle);
 
 
             await vehiclePort.AddVehicle(vehicleAggregate.CurrentVehicle!)!;

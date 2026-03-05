@@ -13,7 +13,7 @@ namespace GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
 public interface IVehiclePort : IUnitOfWork
 {
     Task<Vehicle?> GetVehicle(Expression<Func<Vehicle, bool>> filter);
-    Task<(List<Vehicle>, int)> GetVehicles(Expression<Func<Vehicle, bool>> filter, int pageIndex,
+    Task<(List<Vehicle>, long)> GetVehicles(Expression<Func<Vehicle, bool>> filter, int pageIndex,
         int pageSize);
     Task<List<Vehicle>> GetVehicles(Expression<Func<Vehicle, bool>> filter);
     Task AddVehicle(Vehicle vehicle);
