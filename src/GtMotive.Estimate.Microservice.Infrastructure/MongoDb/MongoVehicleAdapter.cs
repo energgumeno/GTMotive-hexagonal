@@ -17,38 +17,30 @@ public class MongoVehicleAdapter : IVehiclePort
         _collection = database.GetCollection<Vehicle>("Vehicles");
     }
 
-    public async Task<(List<Vehicle>, int)> GetVehicles(int pageIndex, int pageSize)
+
+
+    public async Task<Vehicle?> GetVehicle(Expression<Func<Vehicle, bool>> filter)
     {
-        var totalCount = (int)await _collection.CountDocumentsAsync(FilterDefinition<Vehicle>.Empty);
+        return await _collection.Find(filter).FirstOrDefaultAsync();
+    }
+    
+    public async Task<List<Vehicle>> GetVehicles(Expression<Func<Vehicle, bool>> filter)
+    {
+        return await _collection.Find(filter).ToListAsync();
+    }
+    
+    public async  Task<(List<Vehicle>, int)> GetVehicles(Expression<Func<Vehicle, bool>> filter, int pageIndex, int pageSize)
+    {
         var vehicles = await _collection.Find(FilterDefinition<Vehicle>.Empty)
             .Skip(pageIndex * pageSize)
             .Limit(pageSize)
             .ToListAsync();
-
-        return (vehicles, totalCount);
+        
+        return (vehicles, vehicles.Count); 
     }
 
-    public async Task<Vehicle?> GetVehicle(Guid vehicleId)
-    {
-        var ret = await _collection.Find(v => v.Id == vehicleId).FirstOrDefaultAsync();
-        return ret?.Id == vehicleId ? ret : null;
-    }
+    
 
-    public async Task<Vehicle?> GetVehicle(Expression<Func<Vehicle, bool>> filter)
-    {
-        return await _collection.Find(filter).FirstOrDefaultAsync(); 
-    }
-
-    public async  Task<(List<Vehicle>, int)> GetVehicles(Expression<Func<Vehicle, bool>> filter, int pageIndex, int pageSize)
-    {
-        var rents = await _collection.Find(filter).ToListAsync();
-        return (rents, rents.Count); 
-    }
-
-    public Task<List<Vehicle>> GetVehicles(Expression<Func<Vehicle, bool>> filter)
-    {
-        throw new NotImplementedException();
-    }
 
     public async Task<Guid> AddVehicle(Vehicle vehicle)
     {
