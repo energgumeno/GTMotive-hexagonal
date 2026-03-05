@@ -30,7 +30,7 @@ public static class ApplicationCoreExtensions
 
         // default output ports (null implementation)
         // these can be overridden by specific UI extensions (e.g. WebApi)
-        services.AddScoped<IOutputPortNotFound, NullOutputPortNotFound>();
+        services.AddScoped<IErrorOutputPort, NullErrorOutputPort>();
         services.AddScoped(typeof(IOutputPortStandard<>), typeof(NullOutputPortStandard<>));
 
         return services;

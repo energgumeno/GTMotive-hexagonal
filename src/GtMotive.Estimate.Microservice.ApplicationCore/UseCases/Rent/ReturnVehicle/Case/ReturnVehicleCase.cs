@@ -10,15 +10,17 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.ReturnVeh
 /// </summary>
 /// <param name="busFactory">Factory for bus clients.</param>
 /// <param name="telemetry">Telemetry service.</param>
+/// <param name="logger">The app logger.</param>
 /// <param name="rentVehiclePort">Port for rent vehicle operations.</param>
 /// <param name="outputPortStandard">Standard output port.</param>
-/// <param name="outputPortNotFound">Not found output port.</param>
+/// <param name="errorOutputPort">Error output port.</param>
 public class ReturnVehicleCase(
     IBusFactory busFactory,
     ITelemetry telemetry,
+    IAppLogger<ReturnVehicleCase> logger,
     IRentVehiclePort rentVehiclePort,
     IOutputPortStandard<ReturnVehicleResponse> outputPortStandard,
-    IOutputPortNotFound outputPortNotFound)
+    IErrorOutputPort errorOutputPort)
     : IUseCase<ReturnVehicleCommand>
 {
     /// <summary>
@@ -43,7 +45,7 @@ public class ReturnVehicleCase(
                 await rentVehiclePort.GetVehicleRent(information => information.Id == request.RentId.Value);
             if (vehicleRent == null)
             {
-                outputPortNotFound.NotFoundHandle($"Vehicle rent with id {request.RentId.Value} not found");
+                errorOutputPort.NotFoundHandle($"Vehicle rent with id {request.RentId.Value} not found");
                 return;
             }
 
@@ -60,9 +62,18 @@ public class ReturnVehicleCase(
 
             outputPortStandard.StandardHandle(new ReturnVehicleResponse(request.RentId.Value));
         }
+        catch (ArgumentException ex)
+        {
+            errorOutputPort.BadRequestHandle(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            errorOutputPort.BadRequestHandle(ex.Message);
+        }
         catch (Exception ex)
         {
-            outputPortNotFound.NotFoundHandle(ex.Message);
+            logger.LogError(ex, "An unexpected error occurred while executing ReturnVehicleCase.");
+            errorOutputPort.GeneralErrorHandle("An unexpected error occurred. Please try again later.");
         }
     }
 }

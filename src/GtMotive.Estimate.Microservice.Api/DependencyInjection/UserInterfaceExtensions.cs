@@ -20,7 +20,7 @@ public static class UserInterfaceExtensions
         services.AddScoped<IWebApiPresenter, WebApiPresenter>();
 
         // output ports
-        services.AddScoped<IOutputPortNotFound, OutputPortNotFound>();
+        services.AddScoped<IErrorOutputPort, ErrorOutputPort>();
         services.AddScoped(typeof(IOutputPortStandard<>), typeof(BaseHandler<>));
 
         return services;

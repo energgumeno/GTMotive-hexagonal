@@ -13,8 +13,9 @@ public class RentVehicleFunctionalTests
 {
     private readonly Mock<IBusFactory> _busFactoryMock;
     private readonly Mock<IBus> _busMock;
-    private readonly Mock<IOutputPortNotFound> _outputPortNotFoundMock;
     private readonly Mock<IOutputPortStandard<RentVehicleResponse>> _outputPortStandardMock;
+    private readonly Mock<IErrorOutputPort> _errorOutputPortMock;
+    private readonly Mock<IAppLogger<RentVehicleCase>> _loggerMock;
     private readonly Mock<IRentVehiclePort> _rentVehiclePortMock;
     private readonly Mock<ITelemetry> _telemetryMock;
     private readonly RentVehicleCase _useCase;
@@ -28,7 +29,8 @@ public class RentVehicleFunctionalTests
         _busMock = new Mock<IBus>();
         _telemetryMock = new Mock<ITelemetry>();
         _outputPortStandardMock = new Mock<IOutputPortStandard<RentVehicleResponse>>();
-        _outputPortNotFoundMock = new Mock<IOutputPortNotFound>();
+        _errorOutputPortMock = new Mock<IErrorOutputPort>();
+        _loggerMock = new Mock<IAppLogger<RentVehicleCase>>();
 
         _busFactoryMock.Setup(f => f.GetClient(It.IsAny<Type>())).Returns(_busMock.Object);
 
@@ -38,8 +40,9 @@ public class RentVehicleFunctionalTests
             _rentVehiclePortMock.Object,
             _busFactoryMock.Object,
             _telemetryMock.Object,
+            _loggerMock.Object,
             _outputPortStandardMock.Object,
-            _outputPortNotFoundMock.Object);
+            _errorOutputPortMock.Object);
     }
 
     [Fact]
@@ -71,7 +74,7 @@ public class RentVehicleFunctionalTests
     }
 
     [Fact]
-    public async Task Execute_WhenVehicleDoesNotExist_ShouldCallNotFound()
+    public async Task Execute_WhenVehicleDoesNotExist_ShouldCallBadRequest()
     {
         // Arrange
         var vehicleId = Guid.NewGuid();
@@ -84,7 +87,7 @@ public class RentVehicleFunctionalTests
         await _useCase.Execute(command);
 
         // Assert
-        _outputPortNotFoundMock.Verify(o => o.NotFoundHandle(It.IsAny<string>()), Times.Once);
+        _errorOutputPortMock.Verify(o => o.BadRequestHandle(It.IsAny<string>()), Times.Once);
         _rentVehiclePortMock.Verify(r => r.AddVehicleRent(It.IsAny<RentInformation>()), Times.Never);
     }
 }

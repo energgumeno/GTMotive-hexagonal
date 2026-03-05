@@ -11,10 +11,9 @@ public class NullOutputPortStandard<T> : IOutputPortStandard<T>
     }
 }
 
-public class NullOutputPortNotFound : IOutputPortNotFound
+public class NullErrorOutputPort : IErrorOutputPort
 {
-    public void NotFoundHandle(string message)
-    {
-        // No-op
-    }
+    public void NotFoundHandle(string message) { }
+    public void BadRequestHandle(string message) { }
+    public void GeneralErrorHandle(string message) { }
 }

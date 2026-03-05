@@ -1,4 +1,5 @@
 ﻿using GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehicle.Commands;
+using GtMotive.Estimate.Microservice.Domain.Interfaces;
 using GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
 using GtMotive.Estimate.Microservice.Domain.ValueObjects;
 
@@ -11,13 +12,14 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehi
 ///     Initializes a new instance of the <see cref="ListVehicleCase" /> class.
 /// </remarks>
 /// <param name="vehiclePort"> the writing service.</param>
+/// <param name="logger">The app logger.</param>
 /// <param name="outputPortStandard"> an output standard port.</param>
-/// ///
-/// <param name="outputPortNotFound"> an output standard port.</param>
+/// <param name="errorOutputPort"> the error output port.</param>
 public class ListVehicleCase(
     IVehiclePort vehiclePort,
+    IAppLogger<ListVehicleCase> logger,
     IOutputPortStandard<ListVehicleResponse> outputPortStandard,
-    IOutputPortNotFound outputPortNotFound) : IUseCase<ListVehicleCommand>
+    IErrorOutputPort errorOutputPort) : IUseCase<ListVehicleCommand>
 {
     /// <summary>
     ///     finds the vehicle list for the current page
@@ -37,14 +39,15 @@ public class ListVehicleCase(
 
 
             if (result.Count == 0)
-                outputPortNotFound.NotFoundHandle("vehicle not found");
+                errorOutputPort.NotFoundHandle("vehicle not found");
             else
                 outputPortStandard.StandardHandle(new ListVehicleResponse(result, totalPages, request.PageIndex,
                     request.PageSize));
         }
         catch (Exception ex)
         {
-            outputPortNotFound.NotFoundHandle(ex.Message);
+            logger.LogError(ex, "An unexpected error occurred while executing ListVehicleCase.");
+            errorOutputPort.GeneralErrorHandle("An unexpected error occurred. Please try again later.");
         }
     }
 }

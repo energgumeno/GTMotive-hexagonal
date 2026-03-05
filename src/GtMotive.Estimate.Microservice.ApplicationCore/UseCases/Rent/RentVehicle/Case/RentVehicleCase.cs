@@ -15,15 +15,17 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Rent.RentVehic
 /// <param name="rentVehiclePort">Port for rent vehicle operations.</param>
 /// <param name="busFactory">Factory for bus clients.</param>
 /// <param name="telemetry">Telemetry service.</param>
+/// <param name="logger">The app logger.</param>
 /// <param name="outputPortStandard">Standard output port.</param>
-/// <param name="outputPortNotFound">Not found output port.</param>
+/// <param name="errorOutputPort">Error output port.</param>
 public class RentVehicleCase(
     IVehiclePort vehiclePort,
     IRentVehiclePort rentVehiclePort,
     IBusFactory busFactory,
     ITelemetry telemetry,
+    IAppLogger<RentVehicleCase> logger,
     IOutputPortStandard<RentVehicleResponse> outputPortStandard,
-    IOutputPortNotFound outputPortNotFound) : IUseCase<RentVehicleCommand>
+    IErrorOutputPort errorOutputPort) : IUseCase<RentVehicleCommand>
 {
     /// <summary>
     ///     Executes the rent vehicle use case.
@@ -72,9 +74,25 @@ public class RentVehicleCase(
 
             outputPortStandard.StandardHandle(new RentVehicleResponse(vehicleRentAggregate.RentVehicleInformation!.Id));
         }
+        catch (ArgumentException ex)
+        {
+            errorOutputPort.BadRequestHandle(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            if (ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
+            {
+                errorOutputPort.NotFoundHandle(ex.Message);
+            }
+            else
+            {
+                errorOutputPort.BadRequestHandle(ex.Message);
+            }
+        }
         catch (Exception ex)
         {
-            outputPortNotFound.NotFoundHandle(ex.Message);
+            logger.LogError(ex, "An unexpected error occurred while executing RentVehicleCase.");
+            errorOutputPort.GeneralErrorHandle("An unexpected error occurred. Please try again later.");
         }
     }
 }
