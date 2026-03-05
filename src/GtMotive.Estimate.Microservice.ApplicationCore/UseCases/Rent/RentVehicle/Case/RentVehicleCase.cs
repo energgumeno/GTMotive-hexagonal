@@ -29,6 +29,7 @@ public class RentVehicleCase(
     ///     Executes the rent vehicle use case.
     /// </summary>
     /// <param name="request">The rent vehicle command.</param>
+    /// <exception cref="ArgumentNullException"></exception>
     /// <returns>A task representing the asynchronous operation.</returns>
     public async Task Execute(RentVehicleCommand request)
     {
@@ -42,7 +43,7 @@ public class RentVehicleCase(
         telemetry.TrackEvent(nameof(RentVehicleCase),
             new Dictionary<string, string> { { nameof(RentVehicleCase), "Start..." } });
 
-        var vehicle = await vehiclePort.GetVehicle(request.VehicleId.Value);
+        var vehicle = await vehiclePort.GetVehicle(vehicle=>vehicle.Id == request.VehicleId.Value);
         var rentVehicleByEmail =
             await rentVehiclePort.GetVehiclesRent(information => information.Email == request.Email);
         var reservations =

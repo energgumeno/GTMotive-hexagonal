@@ -51,9 +51,10 @@ public class RentVehicleFunctionalTests
         var command = new RentVehicleCommand("John Doe", "john@example.com", DateTime.Now.AddDays(1),
             DateTime.Now.AddDays(2), vehicleId);
 
-        _vehiclePortMock.Setup(v => v.GetVehicle(vehicleId)).ReturnsAsync(vehicle);
-        _rentVehiclePortMock.Setup(r => r.GetVehicleRent(information=>information.Email== command.Email!)).ReturnsAsync((RentInformation?)null);
-        _rentVehiclePortMock.Setup(r => r.GetVehiclesRent((information)=>information.Id== vehicleId))
+        _vehiclePortMock.Setup(v => v.GetVehicle(veh => veh.Id == vehicleId)).ReturnsAsync(vehicle);
+        _rentVehiclePortMock.Setup(r => r.GetVehicleRent(information => information.Email == command.Email!))
+            .ReturnsAsync((RentInformation?)null);
+        _rentVehiclePortMock.Setup(r => r.GetVehiclesRent((information) => information.Id == vehicleId))
             .ReturnsAsync(new List<RentInformation>());
 
         // Act
@@ -78,7 +79,7 @@ public class RentVehicleFunctionalTests
         var command = new RentVehicleCommand("John Doe", "john@example.com", DateTime.Now.AddDays(1),
             DateTime.Now.AddDays(2), vehicleId);
 
-        _vehiclePortMock.Setup(v => v.GetVehicle(vehicleId)).ReturnsAsync((Vehicle?)null);
+        _vehiclePortMock.Setup(v => v.GetVehicle(veh => veh.Id == vehicleId)).ReturnsAsync((Vehicle?)null);
 
         // Act
         await _useCase.Execute(command);

@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
 using GtMotive.Estimate.Microservice.Domain.ValueObjects;
 using GtMotive.Estimate.Microservice.Infrastructure.MongoDb.Settings;
@@ -16,7 +17,7 @@ public class MongoVehicleAdapter : IVehiclePort
         _collection = database.GetCollection<Vehicle>("Vehicles");
     }
 
-    public async Task<(List<Vehicle?>, int)> GetVehicles(int pageIndex, int pageSize)
+    public async Task<(List<Vehicle>, int)> GetVehicles(int pageIndex, int pageSize)
     {
         var totalCount = (int)await _collection.CountDocumentsAsync(FilterDefinition<Vehicle>.Empty);
         var vehicles = await _collection.Find(FilterDefinition<Vehicle>.Empty)
@@ -24,7 +25,7 @@ public class MongoVehicleAdapter : IVehiclePort
             .Limit(pageSize)
             .ToListAsync();
 
-        return (vehicles.Cast<Vehicle?>().ToList(), totalCount);
+        return (vehicles, totalCount);
     }
 
     public async Task<Vehicle?> GetVehicle(Guid vehicleId)
@@ -33,11 +34,20 @@ public class MongoVehicleAdapter : IVehiclePort
         return ret?.Id == vehicleId ? ret : null;
     }
 
-    public async Task<Vehicle?> GetVehicle(Vehicle vehicle)
+    public async Task<Vehicle?> GetVehicle(Expression<Func<Vehicle, bool>> filter)
     {
-        var ret = await _collection.Find(v => v.LicensePlate == vehicle.LicensePlate || v.FrameId == vehicle.FrameId)
-            .FirstOrDefaultAsync();
-        return ret?.LicensePlate == vehicle.LicensePlate || ret?.FrameId == vehicle.FrameId ? ret : null;
+        return await _collection.Find(filter).FirstOrDefaultAsync(); 
+    }
+
+    public async  Task<(List<Vehicle>, int)> GetVehicles(Expression<Func<Vehicle, bool>> filter, int pageIndex, int pageSize)
+    {
+        var rents = await _collection.Find(filter).ToListAsync();
+        return (rents, rents.Count); 
+    }
+
+    public Task<List<Vehicle>> GetVehicles(Expression<Func<Vehicle, bool>> filter)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<Guid> AddVehicle(Vehicle vehicle)

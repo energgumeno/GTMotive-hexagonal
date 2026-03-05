@@ -10,7 +10,7 @@ namespace GtMotive.Estimate.Microservice.ApplicationCore.UseCases.Fleet.ListVehi
 /// <param name="TotalCount">The total count of items.</param>
 /// <param name="PageNumber">The number of the page.</param>
 /// <param name="PageSize">The size of the page.</param>
-public record ListVehicleResponse(List<Vehicle?> Data, int TotalCount, int PageNumber, int PageSize)
+public record ListVehicleResponse(List<Vehicle> Data, int TotalCount, int PageNumber, int PageSize)
     : PagedResponse<Vehicle>(Data, TotalCount, PageNumber, PageSize), IUseCaseOutput
 {
 }

@@ -36,13 +36,13 @@ public class MongoRentVehicleAdapter : IRentVehiclePort
     }
     public async  Task<(List<RentInformation>, int)> GetVehiclesRent(Expression<Func<RentInformation, bool>> filter, int pageIndex, int pageSize)
     {
-        var totalCount = (int)await _collection.CountDocumentsAsync(filter);
+        
         var rents = await _collection.Find(filter)
             .Skip(pageIndex * pageSize)
             .Limit(pageSize)
             .ToListAsync();
 
-        return (rents, totalCount); 
+        return (rents, rents.Count); 
         
     }
 

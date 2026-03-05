@@ -128,4 +128,22 @@ public class RentInformation : BaseAggregate
                &&
                IsTimeAvailable(newRent.TimeRentStart, newRent.TimeRentEnd);
     }
+
+    protected bool Equals(RentInformation other)
+    {
+        return Fullname == other.Fullname && Email == other.Email && VehicleId.Equals(other.VehicleId) && Status == other.Status && TimeRentStart.Equals(other.TimeRentStart) && TimeRentEnd.Equals(other.TimeRentEnd);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != GetType()) return false;
+        return Equals((RentInformation)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Fullname, Email, VehicleId, (int)Status, TimeRentStart, TimeRentEnd);
+    }
 }

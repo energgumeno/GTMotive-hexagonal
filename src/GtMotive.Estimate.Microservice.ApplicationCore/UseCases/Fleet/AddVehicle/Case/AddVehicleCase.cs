@@ -44,7 +44,7 @@ public class AddVehicleCase(
         telemetry.TrackEvent(nameof(AddVehicleCase),
             new Dictionary<string, string> { { "AddVehicleCase", "Start..." } });
 
-        var vehicle = await vehiclePort.GetVehicle(vehicleAggregate.CurrentVehicle!);
+        var vehicle = await vehiclePort.GetVehicle(vehicle=>vehicle.Equals(vehicleAggregate.CurrentVehicle!));
         if (vehicle != null)
         {
             outputPortNotFound.NotFoundHandle("vehicle already exists");

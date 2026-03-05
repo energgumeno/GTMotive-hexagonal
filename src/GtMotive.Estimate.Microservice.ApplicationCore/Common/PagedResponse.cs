@@ -9,7 +9,7 @@
 /// <param name="PageNumber">The number of the page.</param>
 /// <param name="PageSize">The size of the page.</param>
 public record PagedResponse<T>(
-    List<T?> Data,
+    List<T> Data,
     int TotalCount,
     int PageNumber,
     int PageSize

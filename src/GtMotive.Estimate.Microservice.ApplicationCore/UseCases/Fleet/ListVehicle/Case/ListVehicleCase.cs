@@ -29,16 +29,14 @@ public class ListVehicleCase(
         if (request == null || request.PageIndex < 0 || request.PageSize < 1) request = new ListVehicleCommand(0, 50);
 
         ArgumentNullException.ThrowIfNull(request);
-        List<Vehicle?> result;
-        int TotalPages;
-
-        (result, TotalPages) = await vehiclePort.GetVehicles(request.PageIndex, request.PageSize);
+        
+        var (result, totalPages) = await vehiclePort.GetVehicles((_)=>true, request.PageIndex, request.PageSize);
 
 
         if (result.Count == 0)
             outputPortNotFound.NotFoundHandle("vehicle not found");
         else
-            outputPortStandard.StandardHandle(new ListVehicleResponse(result, TotalPages, request.PageIndex,
+            outputPortStandard.StandardHandle(new ListVehicleResponse(result, totalPages, request.PageIndex,
                 request.PageSize));
     }
 }

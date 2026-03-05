@@ -1,4 +1,5 @@
-﻿using GtMotive.Estimate.Microservice.Domain.ValueObjects;
+﻿using System.Linq.Expressions;
+using GtMotive.Estimate.Microservice.Domain.ValueObjects;
 
 namespace GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
 
@@ -11,8 +12,9 @@ namespace GtMotive.Estimate.Microservice.Domain.Interfaces.Port;
 /// </remarks>
 public interface IVehiclePort : IUnitOfWork
 {
-    Task<(List<Vehicle?>, int )> GetVehicles(int pageIndex, int pageSize);
-    Task<Vehicle?> GetVehicle(Guid vehicleId);
-    Task<Vehicle?> GetVehicle(Vehicle vehicle);
+    Task<Vehicle?> GetVehicle(Expression<Func<Vehicle, bool>> filter);
+    Task<(List<Vehicle>, int)> GetVehicles(Expression<Func<Vehicle, bool>> filter, int pageIndex,
+        int pageSize);
+    Task<List<Vehicle>> GetVehicles(Expression<Func<Vehicle, bool>> filter);
     Task<Guid> AddVehicle(Vehicle vehicle);
 }
